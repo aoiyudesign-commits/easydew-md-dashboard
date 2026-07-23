@@ -88,7 +88,7 @@
         <div class="hm-cell">
           <div class="hm-label">리뷰 인사이트 커버리지</div>
           <div class="hm-value" id="hmReview">-</div>
-          <div class="hm-trend up">▲ 리뷰수 상위 제품</div>
+          <div class="hm-trend up">▲ 실제 리뷰 크롤링 기반</div>
         </div>
         <div class="hm-cell">
           <div class="hm-label">데이터 소스</div>
@@ -102,8 +102,9 @@
   <div class="dash-body">
 
     <div class="data-note">
-      <b>제작 노트.</b> 이지듀 제품/가격/리뷰 수는 easydew.co.kr 공식몰 및 공개 검색 결과를 기반으로 한 실데이터이며, 경쟁사(넘버즈인·구달·AXIS-Y) 가격도 올리브영·자사몰 공개 정보를 반영했습니다.
-      다만 원가율·물류비 등 비공개 재무 수치, 리뷰 감성 비율, 일별 가격 변동 로그는 실제 운영 데이터 접근 없이 만든 <b>추정·시연용(Demo) 값</b>입니다. 실제 입사 후에는 사내 데이터(카페24 통계, CRM, 손익 시트)로 값을 교체해 바로 운영 가능한 구조로 설계했습니다.
+      <b>제작 노트.</b> 이지듀 제품/가격은 easydew.co.kr 공식몰 및 공개 검색 결과를 기반으로 한 실데이터이며, 경쟁사(넘버즈인·구달·AXIS-Y) 가격도 올리브영·자사몰 공개 정보를 반영했습니다.
+      <b>리뷰 인사이트는 easydew.co.kr 상품후기 게시판(board_no=4)에서 직접 크롤링한 실제 리뷰 원문</b>이며, 감성 분포는 실제 별점 분포, 키워드는 원문 언급 빈도를 집계한 것입니다(제품별 표본 5~66건, 전수조사 아님, 2026.07 수집).
+      다만 원가율·물류비 등 비공개 재무 수치와 일별 가격 변동 로그는 실제 운영 데이터 접근 없이 만든 <b>추정·시연용(Demo) 값</b>입니다. 실제 입사 후에는 사내 데이터(카페24 통계, CRM, 손익 시트)로 값을 교체해 바로 운영 가능한 구조로 설계했습니다.
     </div>
 
     <!-- ===================== VIEW: COMPETITOR PRICE ===================== -->
@@ -152,25 +153,25 @@
 
       <div class="grid-2" style="margin-bottom:12px;">
         <div class="card">
-          <div class="card-ey">제품 선택</div>
+          <div class="card-ey"><span class="sb-data-dot" style="display:inline-block;vertical-align:middle;margin-right:6px;"></span>실제 크롤링 데이터</div>
           <div class="card-ttl">리뷰 톤 · 키워드 분석</div>
-          <div class="card-sub">이지듀 자사몰 리뷰 게시판 · 외부 리뷰 커뮤니티에서 수집한 실제 후기 톤을 구조화했습니다.</div>
+          <div class="card-sub" id="reviewMeta">easydew.co.kr 상품후기 게시판(board_no=4)에서 직접 크롤링한 실제 리뷰 원문 기반입니다.</div>
           <select id="reviewProductSelect"></select>
 
           <div style="margin-top:16px;">
-            <div class="footnote" style="margin-bottom:6px;">감성 분포 (추정)</div>
+            <div class="footnote" style="margin-bottom:6px;">감성 분포 (실제 별점 기준)</div>
             <div class="chart-box sm"><canvas id="sentimentChart"></canvas></div>
           </div>
           <div style="margin-top:10px;">
-            <div class="footnote" style="margin-bottom:6px;">언급 키워드 빈도</div>
+            <div class="footnote" style="margin-bottom:6px;">언급 키워드 빈도 (원문 집계)</div>
             <div class="chart-box"><canvas id="keywordChart"></canvas></div>
           </div>
         </div>
 
         <div class="card">
           <div class="card-ey">VOC 발췌</div>
-          <div class="card-ttl">실제 리뷰 톤 요약</div>
-          <div class="card-sub">긍정/개선 포인트를 원문 근접 톤으로 정리했습니다.</div>
+          <div class="card-ttl">실제 리뷰 원문 요약</div>
+          <div class="card-sub">easydew.co.kr 상품후기 게시판에 실제로 작성된 리뷰를 원문 그대로 발췌했습니다.</div>
           <div id="quotesPositive"></div>
           <div id="quotesNegative"></div>
         </div>
