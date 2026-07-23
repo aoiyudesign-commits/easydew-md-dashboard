@@ -71,34 +71,13 @@
     <div class="dash-header-inner">
       <div class="dash-hrow">
         <div>
-          <div class="dash-badge">● 김유빈 · AI 기반 MD 업무 프로토타입 · 디엔코스메틱스 지원용</div>
-          <div class="dash-h1">EASYDEW MD <span>그로스 대시보드</span></div>
-          <div class="dash-sub">이지듀 직영몰 운영 시나리오 기반 프로토타입 · 손익/ROAS · 리뷰 인사이트 · 경쟁사 가격 모니터링</div>
+          <div class="dash-badge" id="headerBadge">-</div>
+          <div class="dash-h1" id="headerTitle">-</div>
+          <div class="dash-sub" id="headerSub">-</div>
         </div>
         <div class="date-range">데이터 기준일&nbsp;&nbsp;<strong>2026년 7월 23일</strong></div>
       </div>
-      <div class="header-metrics">
-        <div class="hm-cell">
-          <div class="hm-label">등록 SKU</div>
-          <div class="hm-value" id="hmSku">-</div>
-          <div class="hm-trend up">▲ 기미/미백 중심 라인업</div>
-        </div>
-        <div class="hm-cell">
-          <div class="hm-label">모니터링 경쟁사</div>
-          <div class="hm-value" id="hmBrand">-</div>
-          <div class="hm-trend up">▲ 올리브영·자사몰 공개가</div>
-        </div>
-        <div class="hm-cell">
-          <div class="hm-label">리뷰 인사이트 커버리지</div>
-          <div class="hm-value" id="hmReview">-</div>
-          <div class="hm-trend up">▲ 실제 리뷰 크롤링 기반</div>
-        </div>
-        <div class="hm-cell">
-          <div class="hm-label">데이터 소스</div>
-          <div class="hm-value">3종</div>
-          <div class="hm-trend up">▲ 판매가·리뷰·경쟁가</div>
-        </div>
-      </div>
+      <div class="header-metrics" id="headerMetrics"></div>
     </div>
   </div>
 
@@ -376,9 +355,9 @@
   </button>
 </nav>
 
-<script src="js/roas.js"></script>
+<script src="js/common.js"></script>
 <script src="js/price.js"></script>
 <script src="js/review.js"></script>
-<script src="js/common.js"></script>
+<script src="js/roas.js"></script>
 </body>
 </html>

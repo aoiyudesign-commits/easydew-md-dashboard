@@ -348,3 +348,21 @@ function renderSegments(d){
 }
 reviewProductSelect.addEventListener("change", renderReview);
 renderReview();
+
+/* ---- 헤더(리뷰 인사이트 도구) ---- */
+window.HEADERS.review = () => {
+  const totalSample = Object.values(reviewInsights).reduce((s,d)=>s+d.sampleN,0);
+  const lowStarCount = vocFeed.filter(r=>r.star!=null && r.star<=3).length;
+  return {
+    badge: "● 김유빈 · 리뷰 인사이트 도구 · 디엔코스메틱스 지원용",
+    title: `리뷰 인사이트 <span>도구</span>`,
+    sub: "실제 리뷰 데이터를 기반으로 VOC를 모니터링하고 고객 세그먼트를 분석합니다",
+    metricsHtml: `
+      <div class="hm-cell"><div class="hm-label">분석 제품</div><div class="hm-value">${Object.keys(reviewInsights).length}개</div><div class="hm-trend up">▲ Cre.ma 리뷰 위젯 API</div></div>
+      <div class="hm-cell"><div class="hm-label">표본 리뷰</div><div class="hm-value">${totalSample}건</div><div class="hm-trend up">▲ 제품당 60건 분석</div></div>
+      <div class="hm-cell"><div class="hm-label">VOC 피드</div><div class="hm-value">${vocFeed.length}건</div><div class="hm-trend up">▲ 전체 카테고리 수집</div></div>
+      <div class="hm-cell"><div class="hm-label">저평점(3점 이하) 감지</div><div class="hm-value">${lowStarCount}건</div><div class="hm-trend ${lowStarCount>0?'down':'up'}">${lowStarCount>0?'▼ CS 대응 필요':'▲ 없음'}</div></div>
+    `,
+  };
+};
+if(document.getElementById("view-review").classList.contains("active")) applyHeaderFor("review");

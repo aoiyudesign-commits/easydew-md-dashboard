@@ -223,3 +223,12 @@ function drawScenarioChart(series){
   document.getElementById(id).addEventListener("change", computeROAS);
 });
 initProductSelect().then(computeROAS);
+
+/* ---- 헤더(손익/ROAS 시뮬레이터) — 집계 지표보다 계산기 자체가 핵심이라 상단 지표 없이 간단히 ---- */
+window.HEADERS.roas = () => ({
+  badge: "● 김유빈 · 손익/ROAS 시나리오 시뮬레이터 · 디엔코스메틱스 지원용",
+  title: `손익 / ROAS <span>시나리오 시뮬레이터</span>`,
+  sub: "제품별 판매가 기준으로 광고비·전환율·원가율을 조정하면 손익이 즉시 계산됩니다",
+  metricsHtml: null,
+});
+if(document.getElementById("view-roas").classList.contains("active")) applyHeaderFor("roas");

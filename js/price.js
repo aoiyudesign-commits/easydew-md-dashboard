@@ -104,3 +104,22 @@ function renderAlerts(){
 }
 document.getElementById("alertThreshold").addEventListener("input", renderAlerts);
 initPriceTab().then(renderAlerts);
+
+/* ---- 헤더(경쟁사 가격 모니터링) ---- */
+window.HEADERS.price = () => {
+  const brandCount = new Set(competitors.filter(c=>c.brand!=="이지듀").map(c=>c.brand)).size;
+  const avgDiscount = Math.round(competitors.reduce((s,c)=>s+(1-c.sale/c.list)*100,0)/competitors.length);
+  const overThreshold = checkPriceAlerts(5).filter(a=>a.type!=="ok").length;
+  return {
+    badge: "● 김유빈 · 경쟁사 가격 모니터링 · 디엔코스메틱스 지원용",
+    title: `경쟁사 가격 <span>모니터링</span>`,
+    sub: "이지듀 자사몰과 경쟁 3개 브랜드의 실시간 가격 포지셔닝을 비교합니다",
+    metricsHtml: `
+      <div class="hm-cell"><div class="hm-label">모니터링 SKU</div><div class="hm-value">${competitors.length}개</div><div class="hm-trend up">▲ 기미/미백 카테고리</div></div>
+      <div class="hm-cell"><div class="hm-label">비교 브랜드</div><div class="hm-value">${brandCount}개 브랜드</div><div class="hm-trend up">▲ 올리브영·자사몰 공개가</div></div>
+      <div class="hm-cell"><div class="hm-label">평균 할인율</div><div class="hm-value">${avgDiscount}%</div><div class="hm-trend up">▲ 정가 대비</div></div>
+      <div class="hm-cell"><div class="hm-label">임계치(5%) 초과 알림</div><div class="hm-value">${overThreshold}건</div><div class="hm-trend ${overThreshold>0?'down':'up'}">${overThreshold>0?'▼ 확인 필요':'▲ 정상 범위'}</div></div>
+    `,
+  };
+};
+if(document.getElementById("view-price").classList.contains("active")) applyHeaderFor("price");
