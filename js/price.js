@@ -21,16 +21,53 @@ async function loadCompetitors(){
   return competitors;
 }
 
-const priceTbody = document.querySelector("#priceTable tbody");
+/**
+ * 가격 스냅샷 테이블 전용 — 채널(올리브영/쿠팡)별로 직접 조사한 실제 판매가.
+ * 가격 포지셔닝 맵·가격 변동 알림은 브랜드당 1개 기준가만 필요해서 위 competitors를
+ * 그대로 쓰고, 이 테이블만 "같은 제품이 채널마다 얼마에 팔리는지"를 보여준다.
+ * 채널마다 입점 여부·구성(용량/기획)이 달라 완전한 1:1 SKU가 아닐 수 있어 name에
+ * 실제 옵션명을 남겼다. list/sale이 null이면 해당 채널 미입점(또는 미확인).
+ */
+const competitorChannelPrices = {
+  oliveyoung: [
+    { brand:"이지듀", name:"기미 앰플 쿠션 15g", size:15, unit:"g", list:39800, sale:38800, reviews:3200 },
+    { brand:"이지듀", name:"EGF 글루타치온 기미잡티 크림 105ml", size:105, unit:"ml", list:45000, sale:45000, reviews:276 },
+    { brand:"이지듀", name:"기미 썬세럼", size:null, unit:"", list:null, sale:null, reviews:null, note:"검색 결과 없음 (미판매로 추정)" },
+    { brand:"넘버즈인", name:"5번 글루타치온C 흔적 앰플 30ml 기획(+패드 6매)", size:30, unit:"ml", list:28000, sale:18500, reviews:8240 },
+    { brand:"구달", name:"청귤 비타C 잡티케어 세럼 알파 30ml+20ml", size:50, unit:"ml", list:28000, sale:21900, reviews:5984 },
+    { brand:"AXIS-Y", name:"다크스팟 코렉팅 글로우 세럼", size:null, unit:"", list:null, sale:null, reviews:null, note:"검색 결과 없음 (올리브영 미입점으로 추정)" },
+  ],
+  coupang: [], // 수집 예정 — 자동화 접속이 일시 제한되어 이번 조사에는 반영하지 못함
+};
 
-async function initPriceTab(){
-  competitors = await loadCompetitors();
+function renderPriceSnapshot(channel){
+  const rows = competitorChannelPrices[channel];
+  const emptyEl = document.getElementById("priceTableEmpty");
+  const tableEl = document.getElementById("priceTable");
 
-  competitors.forEach(c=>{
-    const discount = Math.round((1-c.sale/c.list)*100);
-    const per100 = Math.round(c.sale / c.size * 100);
+  if(rows.length === 0){
+    tableEl.style.display = "none";
+    emptyEl.style.display = "block";
+    emptyEl.innerHTML = `<div class="quote">쿠팡은 이번 조사 시점에 자동화 접속이 일시 제한되어 데이터를 아직 수집하지 못했습니다. 접속이 풀리는 대로 같은 방식으로 채워 넣을 예정입니다.</div>`;
+    return;
+  }
+  tableEl.style.display = "";
+  emptyEl.style.display = "none";
+
+  document.querySelector("#priceTable tbody").innerHTML = rows.map(c=>{
     const isBrand = c.brand === "이지듀";
-    priceTbody.innerHTML += `
+    if(c.sale == null){
+      return `
+        <tr>
+          <td><span class="pill ${isBrand?'brand':'comp'}">${c.brand}</span></td>
+          <td>${c.name}</td>
+          <td colspan="5" style="color:var(--ink-faint);">${c.note}</td>
+          <td>-</td>
+        </tr>`;
+    }
+    const discount = Math.floor((1-c.sale/c.list)*100);
+    const per100 = Math.round(c.sale / c.size * 100);
+    return `
       <tr>
         <td><span class="pill ${isBrand?'brand':'comp'}">${c.brand}</span></td>
         <td>${c.name}</td>
@@ -41,7 +78,19 @@ async function initPriceTab(){
         <td>${per100.toLocaleString()}원 / 100${c.unit}</td>
         <td>${c.reviews.toLocaleString()}</td>
       </tr>`;
-  });
+  }).join("");
+}
+
+document.getElementById("snapshotChannelTabs").addEventListener("click", (e)=>{
+  const btn = e.target.closest("button"); if(!btn) return;
+  document.querySelectorAll("#snapshotChannelTabs button").forEach(b=>b.classList.remove("active"));
+  btn.classList.add("active");
+  renderPriceSnapshot(btn.dataset.channel);
+});
+renderPriceSnapshot("oliveyoung");
+
+async function initPriceTab(){
+  competitors = await loadCompetitors();
 
   const posCtx = document.getElementById("positionChart");
   new Chart(posCtx, {
