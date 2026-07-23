@@ -103,7 +103,7 @@
 
     <div class="data-note">
       <b>제작 노트.</b> 이지듀 제품/가격은 easydew.co.kr 공식몰 및 공개 검색 결과를 기반으로 한 실데이터이며, 경쟁사(넘버즈인·구달·AXIS-Y) 가격도 올리브영·자사몰 공개 정보를 반영했습니다.
-      <b>리뷰 인사이트는 easydew.co.kr 상품후기 게시판(board_no=4)에서 직접 크롤링한 실제 리뷰 원문</b>이며, 감성 분포는 실제 별점 분포, 키워드는 원문 언급 빈도를 집계한 것입니다(제품별 표본 5~66건, 전수조사 아님, 2026.07 수집).
+리뷰 데이터는 두 소스를 함께 사용합니다 — <b>VOC 모니터링 피드</b>는 easydew.co.kr 상품후기 게시판(board_no=4, 구형 Cafe24 게시판)을 크롤링한 것이고, <b>제품별 리뷰 톤·키워드·세그먼트 분석은 실제 상품 상세페이지에 붙어있는 리뷰 위젯(Cre.ma) API</b>에서 직접 수집한 데이터입니다. 감성 분포·키워드·연령대/구매여부/피부고민 태그는 표본(제품별 60건)을 집계한 것이며 전수조사가 아닙니다(2026.07 수집). AI 종합 요약은 리뷰 위젯 벤더가 생성한 결과를 그대로 인용했습니다.
       다만 원가율·물류비 등 비공개 재무 수치와 일별 가격 변동 로그는 실제 운영 데이터 접근 없이 만든 <b>추정·시연용(Demo) 값</b>입니다. 실제 입사 후에는 사내 데이터(카페24 통계, CRM, 손익 시트)로 값을 교체해 바로 운영 가능한 구조로 설계했습니다.
     </div>
 
@@ -176,17 +176,22 @@
 
       <div class="grid-2" style="margin-bottom:12px;">
         <div class="card">
-          <div class="card-ey"><span class="sb-data-dot" style="display:inline-block;vertical-align:middle;margin-right:6px;"></span>실제 크롤링 데이터</div>
+          <div class="card-ey"><span class="sb-data-dot" style="display:inline-block;vertical-align:middle;margin-right:6px;"></span>실제 리뷰 위젯(Cre.ma) API 연동</div>
           <div class="card-ttl">리뷰 톤 · 키워드 분석</div>
-          <div class="card-sub" id="reviewMeta">easydew.co.kr 상품후기 게시판(board_no=4)에서 직접 크롤링한 실제 리뷰 원문 기반입니다.</div>
+          <div class="card-sub" id="reviewMeta">easydew.co.kr 상품 상세페이지의 실제 리뷰 위젯(Cre.ma) API에서 직접 수집한 데이터입니다.</div>
           <select id="reviewProductSelect"></select>
 
-          <div style="margin-top:16px;">
-            <div class="footnote" style="margin-bottom:6px;">감성 분포 (실제 별점 기준)</div>
+          <div class="quote" id="aiSummaryBanner" style="border-left-color:var(--orange);background:rgba(255,96,0,0.05);margin-top:14px;">
+            <b style="color:var(--orange);">✨ AI 종합 요약</b> <span style="color:var(--ink-faint);font-size:10.5px;">(리뷰 위젯 벤더 제공)</span><br>
+            <span id="aiSummaryText"></span>
+          </div>
+
+          <div style="margin-top:14px;">
+            <div class="footnote" style="margin-bottom:6px;">감성 분포 (표본 별점 기준)</div>
             <div class="chart-box sm"><canvas id="sentimentChart"></canvas></div>
           </div>
           <div style="margin-top:10px;">
-            <div class="footnote" style="margin-bottom:6px;">언급 키워드 빈도 (원문 집계)</div>
+            <div class="footnote" style="margin-bottom:6px;">언급 키워드 빈도 (벤더 AI 태그 집계)</div>
             <div class="chart-box"><canvas id="keywordChart"></canvas></div>
           </div>
         </div>
@@ -194,10 +199,37 @@
         <div class="card">
           <div class="card-ey">VOC 발췌</div>
           <div class="card-ttl">실제 리뷰 원문 요약</div>
-          <div class="card-sub">easydew.co.kr 상품후기 게시판에 실제로 작성된 리뷰를 원문 그대로 발췌했습니다.</div>
+          <div class="card-sub">easydew.co.kr에 실제로 작성된 리뷰를 원문 그대로 발췌했습니다.</div>
           <div id="quotesPositive"></div>
           <div id="quotesNegative"></div>
         </div>
+      </div>
+
+      <div class="card" style="margin-bottom:12px;">
+        <div class="card-ey">피부타입 · 연령대 · 구매여부 태깅 (Cre.ma 리뷰 작성 폼)</div>
+        <div class="card-ttl">고객 세그먼트 분석</div>
+        <div class="card-sub" id="segmentMeta">리뷰 작성 시 고객이 직접 선택한 속성을 집계했습니다.</div>
+        <div class="grid-2-eq" style="margin-bottom:10px;">
+          <div>
+            <div class="footnote" style="margin-bottom:6px;">연령대 분포</div>
+            <div class="chart-box sm"><canvas id="ageChart"></canvas></div>
+          </div>
+          <div>
+            <div class="footnote" style="margin-bottom:6px;">구매 여부</div>
+            <div class="chart-box sm"><canvas id="purchaseChart"></canvas></div>
+          </div>
+        </div>
+        <div class="grid-2-eq" style="margin-bottom:0;">
+          <div>
+            <div class="footnote" style="margin-bottom:6px;">피부과 관리 경험</div>
+            <div class="chart-box sm"><canvas id="dermChart"></canvas></div>
+          </div>
+          <div>
+            <div class="footnote" style="margin-bottom:6px;">피부고민 Top (정상 응답만)</div>
+            <div class="chart-box sm"><canvas id="concernChart"></canvas></div>
+          </div>
+        </div>
+        <div id="segmentInsight" style="margin-top:6px;"></div>
       </div>
 
       <div class="grid-2-eq">
