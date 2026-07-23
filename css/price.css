@@ -23,3 +23,13 @@ tr:last-child td { border-bottom: none; }
 }
 .alert-card.ok { background: rgba(26,174,57,0.05); border-color: rgba(26,174,57,0.18); }
 .alert-card:not(.ok) { background: rgba(229,57,53,0.05); border-color: rgba(229,57,53,0.18); }
+
+/* ── 채널 가격 비교 테이블 ── */
+#channelPriceTable td.grp-start { border-top: 2px solid var(--hairline); }
+.evt-badge { display: inline-block; padding: 2px 8px; border-radius: var(--r-full); font-size: 10.5px; font-weight: 700; }
+.evt-badge.on { background: rgba(255,96,0,0.10); color: var(--orange); }
+.evt-badge.off { background: var(--canvas-soft); color: var(--ink-faint); border: 1px solid var(--hairline); }
+.ch-name { font-weight: 700; }
+.ch-name.mall { color: var(--orange); }
+.ch-name.oy   { color: #2f7a3e; }
+.ch-name.cp   { color: var(--primary); }
