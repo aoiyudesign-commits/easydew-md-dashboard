@@ -162,8 +162,16 @@
       </div>
       <div class="card">
         <h2>가격 변동 알림 (데모)</h2>
-        <div class="hint">실서비스에서는 매일 자동 스크래핑으로 경쟁사 가격을 감시하고 임계치 초과 변동을 알림으로 보냅니다. 아래는 오늘 스냅샷을 기준으로 한 시연용 로그입니다.</div>
+        <div class="hint">실서비스에서는 매일 자동 스크래핑 스케줄러가 경쟁사 가격을 수집해 전일 대비 변동률이 아래 임계치를 넘으면 알림을 보냅니다. 임계치를 조정하면 감지 결과가 즉시 재계산됩니다.</div>
+        <div class="row2" style="align-items:end;">
+          <div>
+            <label class="field">알림 임계치 (전일 대비 %)</label>
+            <input type="number" id="alertThreshold" value="5" step="1" min="0">
+          </div>
+          <div class="footnote" id="alertLastRun" style="margin:0 0 9px;text-align:right;"></div>
+        </div>
         <div id="alertList"></div>
+        <div class="footnote">실 서비스 연동 지점: <code>checkPriceAlerts()</code>를 cron/스케줄러(예: 매일 09:00)에서 호출하고, <code>competitors</code> 배열을 스크래핑 결과로 갱신하면 됩니다.</div>
       </div>
     </div>
   </section>

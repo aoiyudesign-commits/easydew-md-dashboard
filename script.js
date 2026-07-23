@@ -1,7 +1,7 @@
 /* =========================================================
    DATA — 실데이터 (easydew.co.kr 및 공개 검색 기준, 2026.07)
    ========================================================= */
-const products = [
+let products = [
   {name:"기미 앰플 쿠션 세트 (멜라 비 토닝 앰플 쿠션)", list:79600, sale:49800, reviews:16874, cat:"기미/미백"},
   {name:"기미매트팩트 1+1", list:99600, sale:49800, reviews:8439, cat:"기미/미백"},
   {name:"EGF 손상케어크림 105ml (베리어 리페어 크림)", list:59800, sale:32900, reviews:4901, cat:"손상/보습"},
@@ -20,14 +20,30 @@ const products = [
   {name:"이지듀 MD 리젠크림 85g (2세대)", list:55000, sale:55000, reviews:13, cat:"손상/보습"},
 ];
 
-const competitors = [
-  {brand:"이지듀", name:"기미 앰플 쿠션 세트", size:14, unit:"g", list:79600, sale:49800, reviews:16874},
-  {brand:"이지듀", name:"EGF 기미크림 105ml", size:105, unit:"ml", list:59800, sale:32400, reviews:4308},
-  {brand:"이지듀", name:"기미 썬세럼", size:40, unit:"ml", list:98000, sale:39000, reviews:4691},
-  {brand:"넘버즈인", name:"5번 글루타치온C 흔적 앰플", size:30, unit:"ml", list:28000, sale:25200, reviews:12400},
-  {brand:"구달", name:"청귤 비타C 잡티케어 세럼", size:30, unit:"ml", list:28000, sale:19300, reviews:9800},
-  {brand:"AXIS-Y", name:"다크스팟 코렉팅 글로우 세럼", size:50, unit:"ml", list:25000, sale:21500, reviews:15600},
+// prevSale: 어제자 판매가(시연용 가정치) — 실연동 시 매일 스크래핑 결과를 여기에 저장/비교
+let competitors = [
+  {brand:"이지듀", name:"기미 앰플 쿠션 세트", size:14, unit:"g", list:79600, sale:49800, prevSale:49800, reviews:16874},
+  {brand:"이지듀", name:"EGF 기미크림 105ml", size:105, unit:"ml", list:59800, sale:32400, prevSale:32400, reviews:4308},
+  {brand:"이지듀", name:"기미 썬세럼", size:40, unit:"ml", list:98000, sale:39000, prevSale:39000, reviews:4691},
+  {brand:"넘버즈인", name:"5번 글루타치온C 흔적 앰플", size:30, unit:"ml", list:28000, sale:25200, prevSale:28000, reviews:12400},
+  {brand:"구달", name:"청귤 비타C 잡티케어 세럼", size:30, unit:"ml", list:28000, sale:19300, prevSale:19300, reviews:9800},
+  {brand:"AXIS-Y", name:"다크스팟 코렉팅 글로우 세럼", size:50, unit:"ml", list:25000, sale:21500, prevSale:25000, reviews:15600},
 ];
+
+/* =========================================================
+   DATA ADAPTER — 실 데이터소스 연동 지점
+   지금은 위 하드코딩 배열을 그대로 반환하지만, 실제 운영에서는
+   아래 두 함수 내부만 카페24 Admin API / 엑셀·CSV export 파서로
+   교체하면 됩니다. 나머지 렌더링·계산 로직은 수정할 필요가 없습니다.
+   ========================================================= */
+async function loadProducts(){
+  // TODO(실연동): return await fetch('/api/cafe24/products').then(r=>r.json());
+  return products;
+}
+async function loadCompetitors(){
+  // TODO(실연동): return await fetch('/api/competitor-prices').then(r=>r.json()); (일 1회 스크래핑 배치 결과)
+  return competitors;
+}
 
 const reviewInsights = {
   "기미 앰플 쿠션 세트 (멜라 비 토닝 앰플 쿠션)": {
@@ -65,6 +81,41 @@ const reviewInsights = {
     negative:[
       ["“유기자차 특성상 도포 직후 향이 다소 강하게 느껴진다는 의견 존재.”", "커뮤니티 리뷰 요약"],
     ]
+  },
+  "기미매트팩트 1+1": {
+    sentiment:[80,13,7],
+    keywords:[["매트마무리",85],["1+1 가성비",74],["커버력",62],["지속력",45],["백탁없음",33],["휴대성",27]],
+    positive:[
+      ["“번들거림 없이 하루종일 매트해서 좋아요.” — 자사몰 리뷰 (5점)", "easydew.co.kr 상품후기"],
+      ["“1+1이라 하나는 파우치에 두고 쓰기 편해요.”", "easydew.co.kr 상품후기"],
+      ["매트 지속력 관련 긍정 언급이 리뷰 커뮤니티에서 다수 발견", "언니의파우치 커뮤니티"],
+    ],
+    negative:[
+      ["“건성 피부에는 각질이 살짝 뜨는 느낌이 있다.”", "커뮤니티 리뷰 요약"],
+      ["“매트한 대신 촉촉함은 다른 제품 대비 부족하다는 의견.”", "커뮤니티 리뷰 요약"],
+    ]
+  },
+  "EGF 손상케어크림 105ml (베리어 리페어 크림)": {
+    sentiment:[76,15,9],
+    keywords:[["장벽개선 체감",70],["보습감",68],["대용량",58],["순한 성분",49],["재구매",38],["향",21]],
+    positive:[
+      ["“시술 후 예민해진 피부에 발랐는데 진정이 빠르네요.”", "easydew.co.kr 상품후기"],
+      ["“105ml라 아깝지 않게 듬뿍 바를 수 있어서 좋아요.”", "easydew.co.kr 상품후기"],
+    ],
+    negative:[
+      ["“보습력은 좋은데 유분감이 다소 있어 지성 피부는 호불호가 갈릴 수 있다.”", "커뮤니티 리뷰 요약"],
+    ]
+  },
+  "DW-EGF 멜라토닝 패치 (기미 집중 패치)": {
+    sentiment:[79,14,7],
+    keywords:[["부분집중케어",81],["휴대성",66],["가격/특가",55],["밀착력",47],["지속력",36],["체감속도",29]],
+    positive:[
+      ["“잡티 부위에 붙이고 자면 아침에 톤이 확실히 달라요.”", "easydew.co.kr 상품후기"],
+      ["“패치라 특정 부위만 집중 케어할 수 있어서 좋아요.”", "언니의파우치 커뮤니티"],
+    ],
+    negative:[
+      ["“밤새 붙이고 자면 아침에 살짝 밀리는 경우가 있다.”", "커뮤니티 리뷰 요약"],
+    ]
   }
 };
 
@@ -86,11 +137,14 @@ document.querySelectorAll(".tab-btn").forEach(btn=>{
    TAB 1: ROAS SIMULATOR
    ========================================================= */
 const productSelect = document.getElementById("productSelect");
-products.forEach((p,i)=>{
-  const o=document.createElement("option");
-  o.value=i; o.textContent = `${p.name} · 판매가 ${p.sale.toLocaleString()}원`;
-  productSelect.appendChild(o);
-});
+async function initProductSelect(){
+  products = await loadProducts();
+  products.forEach((p,i)=>{
+    const o=document.createElement("option");
+    o.value=i; o.textContent = `${p.name} · 판매가 ${p.sale.toLocaleString()}원`;
+    productSelect.appendChild(o);
+  });
+}
 
 const presets = {
   conservative:{cpc:600, cvr:1.6, cogs:36, returnRate:6.5},
@@ -211,7 +265,7 @@ function drawScenarioChart(p, cpc, cvr, cogs, fulfill, returnRate){
   document.getElementById(id).addEventListener("input", computeROAS);
   document.getElementById(id).addEventListener("change", computeROAS);
 });
-computeROAS();
+initProductSelect().then(computeROAS);
 
 /* =========================================================
    TAB 2: REVIEW INSIGHT
@@ -241,6 +295,21 @@ const uspBank = {
     "'유기자차 + 기미케어' 동시 실현 — 자외선 차단제를 바꾸는 것만으로 기미 관리가 되는 차별화 포인트",
     "백탁 없는 산뜻한 제형 — 무기자차 백탁에 지친 2030 고객층 타겟 메시지",
     "기미앰플과 병행 시 개선 효과 4배 (자사 임상 커뮤니케이션) — 크로스셀 번들 설계 근거",
+  ],
+  "기미매트팩트 1+1": [
+    "1+1 번들 자체가 '가성비 재구매 유도' USP — 파우치용+집용 분리 사용 시나리오로 소비 확장",
+    "매트 지속력 중심 포지셔닝 — 유분·피지 고민 있는 여름철 성수기 타겟 메시지에 강점",
+    "커버력+매트 두 마리 토끼 — 쿠션형 대비 '가볍게 덧바르는' 리터치 시장 공략 가능",
+  ],
+  "EGF 손상케어크림 105ml (베리어 리페어 크림)": [
+    "시술 후/예민 피부 진정 니즈 — 피부과·에스테틱 연계 채널(제휴몰) 확장 근거",
+    "105ml 대용량 — 손상케어 카테고리 경쟁사 대비 '아깝지 않게 듬뿍' 사용 경험 강조 가능",
+    "EGF+장벽개선 성분 스토리 — 대웅제약 기술력을 '순한 진정' 메시지로 재해석",
+  ],
+  "DW-EGF 멜라토닝 패치 (기미 집중 패치)": [
+    "부분 집중 패치 포맷 — 크림/세럼 루틴에 '추가 구매'로 자연스럽게 얹는 크로스셀 구조",
+    "가격 접근성(14,900원) — 이지듀 첫구매·체험 유도용 엔트리 SKU로 활용 가능",
+    "'자기 전 붙이고 아침에 확인' 사용 서사 — 짧은 숏폼 광고 소재로 전환 용이",
   ]
 };
 
@@ -258,6 +327,18 @@ const copyBank = {
     ["헤드라인 A","백탁 없는 유기자차, 기미까지 옅어지는 선세럼"],
     ["헤드라인 B","선크림 하나 바꿨을 뿐인데 기미 케어가 시작됩니다"],
     ["번들 제안","기미앰플 + 선세럼 세트 — 병행 사용 시 개선 체감 4배, 번들 할인으로 객단가 UP"],
+  ],
+  "기미매트팩트 1+1": [
+    ["헤드라인 A","하나는 파우치에, 하나는 집에 — 1+1로 만나는 매트 커버"],
+    ["헤드라인 B","번들거림 걱정 끝, 하루종일 매트한 기미팩트"],
+  ],
+  "EGF 손상케어크림 105ml (베리어 리페어 크림)": [
+    ["헤드라인 A","예민해진 피부, 105ml 듬뿍 바르는 진정 리페어 크림"],
+    ["헤드라인 B","장벽부터 채우는 EGF 크림 — 아깝지 않은 대용량"],
+  ],
+  "DW-EGF 멜라토닝 패치 (기미 집중 패치)": [
+    ["헤드라인 A","자기 전 붙이고, 아침에 확인하는 기미 집중 패치"],
+    ["헤드라인 B","14,900원으로 시작하는 이지듀 기미케어 첫걸음"],
   ]
 };
 
@@ -303,52 +384,85 @@ renderReview();
    TAB 3: COMPETITOR PRICE
    ========================================================= */
 const priceTbody = document.querySelector("#priceTable tbody");
-competitors.forEach(c=>{
-  const discount = Math.round((1-c.sale/c.list)*100);
-  const per100 = Math.round(c.sale / c.size * 100);
-  const isBrand = c.brand === "이지듀";
-  priceTbody.innerHTML += `
-    <tr>
-      <td><span class="pill ${isBrand?'brand':'comp'}">${c.brand}</span></td>
-      <td>${c.name}</td>
-      <td>${c.size}${c.unit}</td>
-      <td>${c.list.toLocaleString()}원</td>
-      <td><b>${c.sale.toLocaleString()}원</b></td>
-      <td>${discount}%</td>
-      <td>${per100.toLocaleString()}원 / 100${c.unit}</td>
-      <td>${c.reviews.toLocaleString()}</td>
-    </tr>`;
-});
 
-const posCtx = document.getElementById("positionChart");
-new Chart(posCtx, {
-  type:"scatter",
-  data:{
-    datasets: competitors.map(c=>({
-      label: c.brand+" · "+c.name,
-      data: [{x: Math.round(c.sale/c.size*100), y: c.reviews}],
-      backgroundColor: c.brand==="이지듀" ? "#2f6b4f" : "#c0784a",
-      pointRadius: 8,
-    }))
-  },
-  options:{
-    plugins:{legend:{display:true, position:"bottom", labels:{boxWidth:8,font:{size:10}}}},
-    scales:{
-      x:{title:{display:true,text:"100ml(g) 환산 판매가(원)",font:{size:11}}},
-      y:{title:{display:true,text:"누적 리뷰수",font:{size:11}}}
+async function initPriceTab(){
+  competitors = await loadCompetitors();
+
+  competitors.forEach(c=>{
+    const discount = Math.round((1-c.sale/c.list)*100);
+    const per100 = Math.round(c.sale / c.size * 100);
+    const isBrand = c.brand === "이지듀";
+    priceTbody.innerHTML += `
+      <tr>
+        <td><span class="pill ${isBrand?'brand':'comp'}">${c.brand}</span></td>
+        <td>${c.name}</td>
+        <td>${c.size}${c.unit}</td>
+        <td>${c.list.toLocaleString()}원</td>
+        <td><b>${c.sale.toLocaleString()}원</b></td>
+        <td>${discount}%</td>
+        <td>${per100.toLocaleString()}원 / 100${c.unit}</td>
+        <td>${c.reviews.toLocaleString()}</td>
+      </tr>`;
+  });
+
+  const posCtx = document.getElementById("positionChart");
+  new Chart(posCtx, {
+    type:"scatter",
+    data:{
+      datasets: competitors.map(c=>({
+        label: c.brand+" · "+c.name,
+        data: [{x: Math.round(c.sale/c.size*100), y: c.reviews}],
+        backgroundColor: c.brand==="이지듀" ? "#2f6b4f" : "#c0784a",
+        pointRadius: 8,
+      }))
+    },
+    options:{
+      plugins:{legend:{display:true, position:"bottom", labels:{boxWidth:8,font:{size:10}}}},
+      scales:{
+        x:{title:{display:true,text:"100ml(g) 환산 판매가(원)",font:{size:11}}},
+        y:{title:{display:true,text:"누적 리뷰수",font:{size:11}}}
+      }
     }
-  }
-});
+  });
+}
 
-const alerts = [
-  {type:"down", text:"넘버즈인 5번 글루타치온C 흔적 앰플 — 오늘 25,200원 → 데모 시뮬레이션상 22,700원 (-10%) 감지"},
-  {type:"ok", text:"구달 청귤 비타C 잡티케어 세럼 — 최근 7일 가격 변동 없음 (19,300원 유지)"},
-  {type:"down", text:"AXIS-Y 다크스팟 코렉팅 글로우 세럼 — 올리브영 14% 할인 프로모션 진행 중 (25,000→21,500원)"},
-  {type:"ok", text:"이지듀 기미 앰플 쿠션 — 자사 프로모션 캘린더 기준 정상가 유지, 경쟁사 대비 가격 우위 구간"},
-];
-document.getElementById("alertList").innerHTML = alerts.map(a=>`
-  <div class="alert-card ${a.type==='ok'?'ok':''}">
-    <span>${a.text}</span>
-    <span class="pill ${a.type==='ok'?'up':'down'}">${a.type==='ok'?'정상':'변동'}</span>
-  </div>
-`).join("");
+/**
+ * 스크래핑 스케줄러(cron 등)가 competitors 배열을 최신 가격으로 갱신한 뒤
+ * 이 함수를 호출하면 임계치 기준 변동 알림 목록을 재계산합니다.
+ * 실서비스에서는 setInterval/cron이 이 함수를 주기 호출하고, 결과를 슬랙/이메일로도 전송하면 됩니다.
+ */
+function checkPriceAlerts(thresholdPct){
+  return competitors.map(c=>{
+    const changePct = c.prevSale ? Math.round((c.sale-c.prevSale)/c.prevSale*1000)/10 : 0;
+    const isBrand = c.brand === "이지듀";
+    const exceeded = changePct !== 0 && Math.abs(changePct) >= thresholdPct;
+    let type, text;
+    if(!exceeded){
+      type = "ok";
+      text = `${c.brand} ${c.name} — 전일 대비 가격 변동 없음 (${c.sale.toLocaleString()}원 유지)`;
+    } else if(isBrand){
+      type = "ok";
+      text = `${c.brand} ${c.name} — 자사가 ${changePct>0?"인상":"인하"} ${Math.abs(changePct)}% (${c.prevSale.toLocaleString()}→${c.sale.toLocaleString()}원), 경쟁사 대비 포지션 재확인 필요`;
+    } else {
+      type = "down";
+      text = `${c.brand} ${c.name} — ${changePct<0?"가격 인하":"가격 인상"} ${Math.abs(changePct)}% 감지 (${c.prevSale.toLocaleString()}→${c.sale.toLocaleString()}원), 임계치(${thresholdPct}%) 초과`;
+    }
+    return {type, text};
+  });
+}
+
+function renderAlerts(){
+  const threshold = +document.getElementById("alertThreshold").value || 0;
+  const alerts = checkPriceAlerts(threshold);
+  document.getElementById("alertList").innerHTML = alerts.map(a=>`
+    <div class="alert-card ${a.type==='ok'?'ok':''}">
+      <span>${a.text}</span>
+      <span class="pill ${a.type==='ok'?'up':'down'}">${a.type==='ok'?'정상':'변동'}</span>
+    </div>
+  `).join("");
+  const now = new Date();
+  document.getElementById("alertLastRun").textContent =
+    `마지막 확인: ${now.getHours().toString().padStart(2,"0")}:${now.getMinutes().toString().padStart(2,"0")} (임계치 ${threshold}%)`;
+}
+document.getElementById("alertThreshold").addEventListener("input", renderAlerts);
+initPriceTab().then(renderAlerts);
