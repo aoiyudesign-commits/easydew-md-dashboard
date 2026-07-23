@@ -55,6 +55,7 @@ async function initPriceTab(){
       }))
     },
     options:{
+      responsive:true, maintainAspectRatio:false,
       plugins:{legend:{display:true, position:"bottom", labels:{boxWidth:8,font:{size:10,family:"Inter"},color:"#615d59"}}},
       scales:{
         x:{title:{display:true,text:"100ml(g) 환산 판매가(원)",font:{size:11}}},

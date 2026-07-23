@@ -17,3 +17,9 @@
 }
 .alert-card.ok { background: rgba(26,174,57,0.05); border-color: rgba(26,174,57,0.18); }
 .alert-card:not(.ok) { background: rgba(229,57,53,0.05); border-color: rgba(229,57,53,0.18); }
+
+/* ── 포지셔닝 맵 + 가격 변동 알림: 알림 카드가 항목 수에 따라 늘어나므로
+   두 카드 높이를 맞추고, 맵 카드는 남는 공간만큼 차트가 함께 커지도록 함 ── */
+.grid-2-eq.stretch { align-items: stretch; }
+.grid-2-eq.stretch > .card { display: flex; flex-direction: column; }
+.grid-2-eq.stretch > .card .chart-box { flex: 1; height: auto; min-height: 220px; }

@@ -101,20 +101,7 @@
     <section class="view active" id="view-price">
       <div class="sec-label">경쟁사 가격 모니터링</div>
 
-      <div class="card" style="margin-bottom:12px;">
-        <div class="card-ey">기미/미백 카테고리</div>
-        <div class="card-ttl">가격 스냅샷</div>
-        <div class="card-sub">이지듀 자사몰 및 올리브영·브랜드 공식몰 공개 가격 기준 (2026.07 조사). 100ml(g) 환산 단가로 정규화했습니다.</div>
-        <div class="data-freshness"><span class="dot"></span>마지막 갱신 <b>2026.07.23</b> · 권장 갱신 주기 <b>매일</b> (경쟁사 가격은 변동이 잦음)</div>
-        <table id="priceTable">
-          <thead>
-            <tr><th>브랜드</th><th>제품명</th><th>용량</th><th>정가</th><th>판매가</th><th>할인율</th><th>100ml 환산가</th><th>리뷰수</th></tr>
-          </thead>
-          <tbody></tbody>
-        </table>
-      </div>
-
-      <div class="grid-2-eq">
+      <div class="grid-2-eq stretch" style="margin-bottom:12px;">
         <div class="card">
           <div class="card-ey">포지셔닝 분석</div>
           <div class="card-ttl">가격 포지셔닝 맵</div>
@@ -136,6 +123,19 @@
           <div id="alertList"></div>
           <div class="footnote">실 서비스 연동 지점: <code>checkPriceAlerts()</code>를 cron/스케줄러(예: 매일 09:00)에서 호출하고, <code>competitors</code> 배열을 스크래핑 결과로 갱신하면 됩니다.</div>
         </div>
+      </div>
+
+      <div class="card">
+        <div class="card-ey">기미/미백 카테고리</div>
+        <div class="card-ttl">가격 스냅샷</div>
+        <div class="card-sub">이지듀 자사몰 및 올리브영·브랜드 공식몰 공개 가격 기준 (2026.07 조사). 100ml(g) 환산 단가로 정규화했습니다.</div>
+        <div class="data-freshness"><span class="dot"></span>마지막 갱신 <b>2026.07.23</b> · 권장 갱신 주기 <b>매일</b> (경쟁사 가격은 변동이 잦음)</div>
+        <table id="priceTable">
+          <thead>
+            <tr><th>브랜드</th><th>제품명</th><th>용량</th><th>정가</th><th>판매가</th><th>할인율</th><th>100ml 환산가</th><th>리뷰수</th></tr>
+          </thead>
+          <tbody></tbody>
+        </table>
       </div>
     </section>
 
