@@ -100,6 +100,132 @@ const reviewInsights = {
 const defaultInsightKey = "[3000억 페스타] 대용량 기미앰플 40mL";
 
 /* =========================================================
+   VOC 모니터링 피드 — easydew.co.kr 상품후기 게시판(board_no=4) 전체 카테고리에서
+   직접 크롤링한 실제 리뷰 36건(2026.07 수집, 2022.10~2025.09 작성분). 특정 4개
+   제품에 한정하지 않고 여러 카테고리를 섞어 "신규 리뷰 인박스" 워크플로우를 시연한다.
+   실 서비스에서는 스케줄러가 매일 신규 게시물만 수집해 이 배열에 추가하면 된다.
+   (수집 스크립트: scripts/crawl_reviews.py)
+   ========================================================= */
+const vocFeed = [
+  {date:"2025-09-30", star:5, product:"쿠션 샘플(증정)", title:"이지듀 쿠션 샘플을 종류별로 테스트해 볼 수 있어서 좋아요. 21호와 22호 차이가 궁금", url:"https://easydew.co.kr/article/상품-사용후기/4/165166/page/42/"},
+  {date:"2025-05-28", star:1, product:"[한정수량] 기미매트팩트 1+1 단독 특가", title:"광고가 많아서 구매해봤는데 .......", url:"https://easydew.co.kr/article/상품-사용후기/4/52642/page/19/"},
+  {date:"2025-05-14", star:5, product:"[100억 돌파] 여름 기미 매트 팩트 특가", title:"여름도 다가오고 해서 매트타입으로 구맸어요~ 커버력 좋아요.", url:"https://easydew.co.kr/article/상품-사용후기/4/51973/page/87/"},
+  {date:"2025-05-14", star:4, product:"[100억 돌파] 여름 기미 매트 팩트 특가", title:"광고보고 혹시나 했는데 발림성은 괜찮은데 지속력은 오래가지않아요.", url:"https://easydew.co.kr/article/상품-사용후기/4/51971/page/75/"},
+  {date:"2025-05-14", star:5, product:"[48시간 타임특가🧧] 기미 앰플 쿠션", title:"엄마가 써보고 좋다고 하셔서 재구매하면서 제것도 구매했는데요 좋네요", url:"https://easydew.co.kr/article/상품-사용후기/4/51968/page/85/"},
+  {date:"2025-05-14", star:2, product:"[48시간 타임특가🧧] 기미 앰플 쿠션", title:"불만족", url:"https://easydew.co.kr/article/상품-사용후기/4/51964/page/66/"},
+  {date:"2025-05-07", star:5, product:"베리어리페어 크림 50ml", title:"프락셀 레이저 시술을 받고 재생크림을 찾다가 챗gpt한테 추천 받아서 사봤습니다. 리뷰도 좋고 많은 사람들...", url:"https://easydew.co.kr/article/상품-사용후기/4/51405/page/69/"},
+  {date:"2024-10-11", star:4, product:"[한정수량] 기미 앰플 쿠션 세트 1+1", title:"이지듀 기미 앰플 써보고 믿음가는 제품으로 픽 팩트까지 나오다니....의심없이 바로주문했어요. 21호 페어...", url:"https://easydew.co.kr/article/상품-사용후기/4/38882/page/4/"},
+  {date:"2024-10-09", star:2, product:"[한정수량] 기미 앰플 쿠션 세트 1+1", title:"불만족", url:"https://easydew.co.kr/article/상품-사용후기/4/38793/page/3/"},
+  {date:"2023-08-22", star:4, product:"[~50%] SOS 트러블 스팟 15ml", title:"턱쪽에 좁쌀이 좀 있어서 주문했는데 살짝 작아진듯?! 한느낌이 드는데 아예 없어지닌 않았어요 흔적에는 좀...", url:"https://easydew.co.kr/article/상품-사용후기/4/22390/page/86/"},
+  {date:"2023-08-12", star:5, product:"EGF 손상케어크림 105ml (크림105ml 유통기한: 2027.01)", title:"이지듀 다른더 쓰다가 이번에 편평사마귀 제거하고 재생에 좋다해서 주문했어요", url:"https://easydew.co.kr/article/상품-사용후기/4/22192/page/57/"},
+  {date:"2023-08-08", star:5, product:"DW- EGF 크림 모이스트 플러스 50ml (기존)", title:"피부과에서 시술 후 바르는 재생크림", url:"https://easydew.co.kr/article/상품-사용후기/4/22127/page/81/"},
+  {date:"2023-07-19", star:3, product:"[NEW] 스페셜 홈케어 마이크로샷 ~75%", title:"패키지 부터 조금 실망햇습니다. 적은 용량을 사긴 햇지만 용량이 너무 적고 니들도 한번에 샤르륵 녹아 버...", url:"https://easydew.co.kr/article/상품-사용후기/4/21681/page/53/"},
+  {date:"2023-06-27", star:5, product:"[NEW] 스페셜 홈케어 마이크로샷 ~75%", title:"효과바로 떠네요 ! 제구매 할거에요", url:"https://easydew.co.kr/article/상품-사용후기/4/21402/page/82/"},
+  {date:"2023-06-26", star:3, product:"[~66%] EGF 기미관리 앰플 30ml", title:"첫 느낌은 발림성이 너무 좋아서 실리콘 성분이 들었나보다 였어요 가격은 부담되네요 이게 효과를 느끼려면...", url:"https://easydew.co.kr/article/상품-사용후기/4/21382/page/29/"},
+  {date:"2023-06-12", star:4, product:"[~66%] EGF 기미관리 앰플 30ml", title:"앰플과 마스크를 같이 주문했고, 마스크팩은 자주 하지 않았습니다. 앰플은 매일 밤 꼭 발랐어요. 워낙 깊고...", url:"https://easydew.co.kr/article/상품-사용후기/4/21233/page/12/"},
+  {date:"2023-03-12", star:5, product:"[3000억 페스타] 대용량 기미앰플 40mL (배송 안내: 7월 14일부터 순차 출고 예정)", title:"1주일 사용했습니다", url:"https://easydew.co.kr/article/상품-사용후기/4/19956/page/77/"},
+  {date:"2023-03-08", star:5, product:"[3000억 페스타] 대용량 기미앰플 40mL (배송 안내: 7월 14일부터 순차 출고 예정)", title:"즉각적인 미백효과가 있어요", url:"https://easydew.co.kr/article/상품-사용후기/4/19912/page/3/"},
+  {date:"2023-02-24", star:5, product:"도자기결 세트", title:"드디어 깨순이 탈출 ㅠㅠ", url:"https://easydew.co.kr/article/상품-사용후기/4/19793/page/12/"},
+  {date:"2023-02-24", star:5, product:"DW-EGF 크림 리미티드 70ml", title:"원래 김우리샵에서 공동구매로사는초록이!!!근데똑떨어졌지모야ㅜㅜ. 나는원래 아무거나못바름 잘못바르면얼...", url:"https://easydew.co.kr/article/상품-사용후기/4/19780/page/6/"},
+  {date:"2023-02-17", star:4, product:"[기미백설크림] DW-EGF크림 화이트토닝 (50MLx2EA)", title:"이지듀에서 나온 미백크림인데 당근 좋겠죠 기대되요", url:"https://easydew.co.kr/article/상품-사용후기/4/19720/page/69/"},
+  {date:"2023-02-17", star:5, product:"DW- EGF 크림 모이스트 플러스 50ml (기존)", title:"EGF빨간거 초록색 다써봤어요 빨간건 레이져 받고쓰기 좋고 초록색은 데일리로 좋았구요 신상나와서 바로구...", url:"https://easydew.co.kr/article/상품-사용후기/4/19719/page/80/"},
+  {date:"2023-01-31", star:4, product:"DW-EGF 크림 리미티드 플러스 15ml", title:"너무좋아요. 용량 큰거좀 만들어주세요. 금방써요. 사용감 좋고 바르면 피부가 보들보들해요. 트러블도 없어...", url:"https://easydew.co.kr/article/상품-사용후기/4/19642/page/72/"},
+  {date:"2023-01-31", star:5, product:"리페어컨트롤 에센셜 베리어 미스트 60ML", title:"친구가 너무 좋대서 사봄", url:"https://easydew.co.kr/article/상품-사용후기/4/19641/page/86/"},
+  {date:"2023-01-17", star:4, product:"DW-EGF 더블 시너지 앰플 50ml", title:"사용 후 당김 느껴지지 않고 촉촉해요 눈에 띄는 효과는 아직 모르겠고 조금 더 사용해봐야할듯 합니다. 스...", url:"https://easydew.co.kr/article/상품-사용후기/4/19595/page/50/"},
+  {date:"2023-01-15", star:5, product:"EGF 프레좀 RX 탄력크림 특가 50mL", title:"바르고 나면 흡수력도 좋고 촉촉해서 만족해요", url:"https://easydew.co.kr/article/상품-사용후기/4/19584/page/38/"},
+  {date:"2023-01-11", star:5, product:"DW-EGF 크림 리미티드 70ml", title:"친구 피부 광나는거 보고 따라샀습니다 저에게도 맡길 바랍니다 ㅎㅎ", url:"https://easydew.co.kr/article/상품-사용후기/4/19572/page/59/"},
+  {date:"2023-01-05", star:5, product:"[기미백설크림] DW-EGF크림 화이트토닝 (50MLx2EA)", title:"재 구매하여 잘 사용하겠읍니딘", url:"https://easydew.co.kr/article/상품-사용후기/4/19554/page/33/"},
+  {date:"2022-12-20", star:4, product:"[블프 한정] DW-EGF 리더마 앰플 (1ml*14ea)", title:"바르면 아주촉촉해요 저녁에 바르고 아침에 일어나도 당기지않아요", url:"https://easydew.co.kr/article/상품-사용후기/4/16805/page/69/"},
+  {date:"2022-12-18", star:5, product:"[TOP크림] [깐달걀크림] DW-EFG 크림 프레좀 RX 50ML X2 + 연말결산 이지키트 추가 증정!", title:"번쩍번쩍 광나는 피부", url:"https://easydew.co.kr/article/상품-사용후기/4/16792/page/86/"},
+  {date:"2022-11-28", star:5, product:"EGF 기미 집중 패치", title:"보습력 + 맑은 피부톤", url:"https://easydew.co.kr/article/상품-사용후기/4/16688/page/16/"},
+  {date:"2022-11-28", star:5, product:"도자기결 세트", title:"5일만에 효과 봤어요!!", url:"https://easydew.co.kr/article/상품-사용후기/4/16682/page/83/"},
+  {date:"2022-11-07", star:5, product:"듀얼 클렌징 브러쉬", title:"브러쉬 너무 좋아서 다른 거 못쓰겠어요.. 지갑 열리게 하는 제품,,", url:"https://easydew.co.kr/article/상품-사용후기/4/16551/page/44/"},
+  {date:"2022-11-07", star:5, product:"카밍컨트롤 톤업 커버 크림40ML", title:"보기 싫은 피부 완벽히 커버하네요. 역시 이지듀 최고!!", url:"https://easydew.co.kr/article/상품-사용후기/4/16549/page/73/"},
+  {date:"2022-11-06", star:5, product:"듀얼 클렌징 브러쉬", title:"듀얼 클렌징 브러쉬 후기", url:"https://easydew.co.kr/article/상품-사용후기/4/16531/page/76/"},
+  {date:"2022-10-26", star:5, product:"[빨간통크림] DW-EGF 크림 프레좀 RX (30ml X3ea)(유통기한 2026.11까지)", title:"제가 젤 조아하는 크림이에요 빨간통 크림.... 나만 알고싶은 크림... 정말 깐달걀크림이라는 별명이 딱이에...", url:"https://easydew.co.kr/article/상품-사용후기/4/16421/page/47/"},
+];
+
+/**
+ * 제품명 기반 카테고리 자동 분류. 실 서비스에서는 카페24 상품 카테고리 API 값을
+ * 그대로 쓰면 되지만, 여기서는 크롤링한 제품명만으로 분류하는 규칙 기반 로직을 시연한다.
+ */
+function classifyCategory(product){
+  if(/기미/.test(product)) return "기미/미백";
+  if(/화이트|미백|톤업|브라이트닝/.test(product)) return "미백/톤업";
+  if(/트러블|스팟/.test(product)) return "트러블/흔적";
+  if(/탄력|리프팅|링클/.test(product)) return "탄력/주름";
+  if(/쿠션|비비|팩트|커버 크림/.test(product)) return "메이크업";
+  if(/클렌징|폼|브러쉬/.test(product)) return "클렌징";
+  if(/손상|리페어|모이스트|크림|보습|베리어|앰플|세럼|패치|마스크|샷|세트/.test(product)) return "손상/보습";
+  return "기타";
+}
+
+/** 리뷰 원문 키워드 기반 이슈 자동 태깅. 신규 리뷰가 들어올 때마다 실행하면 된다. */
+const ISSUE_RULES = [
+  ["광고 관련 불만", /광고/],
+  ["지속력 부족", /지속력|오래가지\s*않/],
+  ["트러블·자극", /트러블|자극|따갑|좁쌀/],
+  ["가격 부담", /가격.{0,4}(비싸|부담)/],
+  ["효과 미체감", /효과.{0,6}(없|모르겠|글쎄|의문)|아직.{0,6}모르겠/],
+  ["발림성·흡수", /발림성|흡수력/],
+  ["보습·촉촉함", /촉촉|보습/],
+  ["커버력", /커버력|커버하|커버해/],
+  ["구성·패키지", /패키지|사은품|개별포장/],
+  ["재구매 의사", /재구매|재구입|또\s*구매/],
+];
+function classifyIssues(title){
+  return ISSUE_RULES.filter(([,re])=>re.test(title)).map(([label])=>label);
+}
+
+function renderVocFeed(){
+  const catFilter = document.getElementById("vocCatFilter").value;
+  const starFilter = document.getElementById("vocStarFilter").value;
+
+  const rows = vocFeed.map(r=>({
+    ...r,
+    category: classifyCategory(r.product),
+    issues: classifyIssues(r.title),
+    low: r.star!=null && r.star<=3,
+  })).filter(r=>{
+    if(catFilter!=="all" && r.category!==catFilter) return false;
+    if(starFilter==="low" && !r.low) return false;
+    return true;
+  });
+
+  document.getElementById("vocTotal").textContent = rows.length+"건";
+  document.getElementById("vocLow").textContent = rows.filter(r=>r.low).length+"건";
+
+  const tagCount = {};
+  rows.forEach(r=>r.issues.forEach(t=>{ tagCount[t] = (tagCount[t]||0)+1; }));
+  const topTag = Object.entries(tagCount).sort((a,b)=>b[1]-a[1])[0];
+  document.getElementById("vocTopIssue").textContent = topTag ? `${topTag[0]} (${topTag[1]}건)` : "해당 없음";
+
+  document.getElementById("vocList").innerHTML = rows.map(r=>`
+    <div class="voc-row ${r.low?'low':''}">
+      <div class="voc-meta">${r.date}<br><span class="voc-star">${"★".repeat(r.star||0)}${"☆".repeat(5-(r.star||0))}</span></div>
+      <div class="voc-body">
+        <div class="voc-product">${r.product}</div>
+        <div class="voc-title">${r.title}</div>
+        <div class="voc-tags">
+          <span class="tag cat">${r.category}</span>
+          ${r.issues.map(t=>`<span class="tag">${t}</span>`).join("")}
+          ${r.low?'<span class="tag warn">CS 대응 필요</span>':''}
+        </div>
+      </div>
+      <a class="voc-link" href="${r.url}" target="_blank" rel="noopener">원문 보기 ↗</a>
+    </div>
+  `).join("");
+}
+
+const vocCatSelect = document.getElementById("vocCatFilter");
+const vocCategories = [...new Set(vocFeed.map(r=>classifyCategory(r.product)))].sort();
+vocCatSelect.innerHTML = `<option value="all">전체 카테고리</option>` +
+  vocCategories.map(c=>`<option value="${c}">${c}</option>`).join("");
+vocCatSelect.addEventListener("change", renderVocFeed);
+document.getElementById("vocStarFilter").addEventListener("change", renderVocFeed);
+renderVocFeed();
+
+/* =========================================================
    TAB SWITCH — sidebar + mobile bottom-nav share .tab-btn,
    so keep both copies of the active tab in sync.
    ========================================================= */
