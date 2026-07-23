@@ -1,0 +1,25 @@
+/* =========================================================
+   경쟁사 가격 모니터링 메뉴 전용 스타일.
+   (가격 스냅샷 테이블, 브랜드 배지, 가격 변동 알림 카드)
+   ========================================================= */
+
+/* ── PILL / BADGE ── */
+.pill { display: inline-block; padding: 2px 8px; border-radius: var(--r-full); font-size: 10.5px; font-weight: 700; }
+.pill.brand { background: rgba(255,96,0,0.10); color: var(--orange); }
+.pill.comp { background: var(--canvas-soft); color: var(--ink-muted); border: 1px solid var(--hairline); }
+.pill.down { background: rgba(229,57,53,0.10); color: var(--red); }
+.pill.up { background: rgba(26,174,57,0.10); color: var(--green); }
+
+/* ── TABLE ── */
+table { width: 100%; border-collapse: collapse; font-size: 12px; }
+th,td { padding: 9px 10px; text-align: left; border-bottom: 1px solid var(--canvas-soft); }
+th { color: var(--ink-faint); font-weight: 700; font-size: 9.5px; text-transform: uppercase; letter-spacing: 0.05em; }
+tr:last-child td { border-bottom: none; }
+
+/* ── ALERT LIST ── */
+.alert-card {
+  display: flex; justify-content: space-between; align-items: center; gap: 10px;
+  background: var(--canvas-soft); border: 1px solid var(--hairline); border-radius: var(--r-md); padding: 11px 14px; margin-bottom: 8px; font-size: 12px; color: var(--ink-secondary); line-height: 1.5;
+}
+.alert-card.ok { background: rgba(26,174,57,0.05); border-color: rgba(26,174,57,0.18); }
+.alert-card:not(.ok) { background: rgba(229,57,53,0.05); border-color: rgba(229,57,53,0.18); }

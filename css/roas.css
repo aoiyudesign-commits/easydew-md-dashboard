@@ -1,0 +1,29 @@
+/* =========================================================
+   손익 / ROAS 시나리오 시뮬레이터 메뉴 전용 스타일.
+   (헤드라인 KPI 카드 + 스파크라인, 프리셋 버튼)
+   ========================================================= */
+
+/* ── METRIC CARDS (with sparkline) ── */
+.metrics-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 10px; margin-bottom: 14px; align-items: start; }
+.metric-card { background: var(--surface); border: 1px solid var(--hairline); border-radius: var(--r-lg); padding: 16px 16px 12px; box-shadow: var(--shadow-1); }
+.mc-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 5px; }
+.mc-label { font-size: 10px; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; color: var(--ink-faint); }
+.mc-badge { font-size: 10px; font-weight: 700; padding: 1px 6px; border-radius: var(--r-full); display: flex; align-items: center; gap: 2px; }
+.mc-badge.up   { background: rgba(26,174,57,0.10); color: var(--green); }
+.mc-badge.down { background: rgba(229,57,53,0.10); color: var(--red); }
+.mc-value { font-size: 24px; font-weight: 800; letter-spacing: -1px; line-height: 1; }
+.mc-sub   { font-size: 10px; color: var(--ink-faint); margin-top: 2px; }
+.sp-wrap  { position: relative; height: 36px; margin-top: 10px; }
+.sp-wrap canvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
+
+/* ── 시나리오 프리셋 버튼 ── */
+.preset-btns { display: flex; gap: 6px; margin-top: 10px; }
+.preset-btns button {
+  flex: 1; padding: 7px 4px; border-radius: var(--r-md); border: 1px solid var(--hairline);
+  background: var(--canvas-soft); font-size: 12px; cursor: pointer; color: var(--ink-muted); font-weight: 600; font-family: inherit;
+}
+.preset-btns button.active { background: rgba(255,96,0,0.08); border-color: var(--orange); color: var(--orange); }
+
+@media (max-width: 860px) {
+  .metrics-grid { grid-template-columns: repeat(2,1fr); }
+}

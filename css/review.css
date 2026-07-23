@@ -1,0 +1,39 @@
+/* =========================================================
+   리뷰 인사이트 도구 메뉴 전용 스타일.
+   (VOC 모니터링 피드, 리뷰 원문 인용, USP/카피 카드)
+   ========================================================= */
+
+/* ── QUOTE / USP / COPY ── */
+.quote {
+  background: var(--canvas-soft); border-left: 3px solid var(--primary); border-radius: 0 var(--r-md) var(--r-md) 0;
+  padding: 10px 14px; font-size: 12.5px; margin-bottom: 8px; color: var(--ink-secondary); line-height: 1.55;
+}
+.quote.neg { border-left-color: var(--red); }
+.quote small { display: block; margin-top: 4px; color: var(--ink-faint); font-size: 10.5px; }
+
+.copy-card { background: var(--canvas-soft); border: 1px dashed #d7d2ca; border-radius: var(--r-md); padding: 12px 14px; margin-bottom: 10px; }
+.copy-card .tag2 { font-size: 10px; font-weight: 700; color: var(--orange); text-transform: uppercase; letter-spacing: 0.05em; }
+.copy-card p { margin: 6px 0 0; font-size: 13px; font-weight: 600; color: var(--ink); }
+
+/* ── VOC MONITORING FEED ── */
+.voc-controls { display: flex; gap: 8px; margin-bottom: 12px; flex-wrap: wrap; }
+.voc-controls select { width: auto; min-width: 170px; }
+.voc-list { max-height: 560px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; padding-right: 2px; }
+.voc-row { display: flex; gap: 12px; align-items: flex-start; padding: 11px 13px; background: var(--canvas-soft); border: 1px solid var(--hairline); border-radius: var(--r-md); }
+.voc-row.low { background: rgba(229,57,53,0.05); border-color: rgba(229,57,53,0.18); }
+.voc-meta { width: 84px; flex-shrink: 0; font-size: 10.5px; color: var(--ink-faint); line-height: 1.6; }
+.voc-star { font-weight: 700; color: var(--orange); letter-spacing: -1px; }
+.voc-body { flex: 1; min-width: 0; }
+.voc-product { font-size: 10.5px; color: var(--ink-faint); margin-bottom: 2px; }
+.voc-title { font-size: 12.5px; color: var(--ink-secondary); line-height: 1.5; }
+.voc-tags { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 7px; }
+.tag { font-size: 9.5px; font-weight: 700; padding: 2px 7px; border-radius: var(--r-full); background: var(--surface); border: 1px solid var(--hairline); color: var(--ink-muted); white-space: nowrap; }
+.tag.cat { background: rgba(0,117,222,0.08); color: var(--primary); border-color: transparent; }
+.tag.warn { background: rgba(229,57,53,0.10); color: var(--red); border-color: transparent; }
+.voc-link { flex-shrink: 0; font-size: 10.5px; color: var(--primary); text-decoration: none; font-weight: 600; white-space: nowrap; margin-top: 1px; }
+.voc-link:hover { text-decoration: underline; }
+
+@media (max-width: 860px) {
+  .voc-row { flex-wrap: wrap; }
+  .voc-meta { width: auto; }
+}
