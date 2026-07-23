@@ -8,6 +8,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/base.css">
 <link rel="stylesheet" href="css/price.css">
+<link rel="stylesheet" href="css/own-product.css">
 <link rel="stylesheet" href="css/review.css">
 <link rel="stylesheet" href="css/roas.css">
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
@@ -32,6 +33,13 @@
         <svg width="15" height="15" viewBox="0 0 15 15" fill="currentColor"><rect x="1" y="8" width="3" height="6" rx="0.5"/><rect x="6" y="4" width="3" height="10" rx="0.5"/><rect x="11" y="1" width="3" height="13" rx="0.5"/></svg>
       </div>
       경쟁사 가격 모니터링
+    </button>
+
+    <button class="sb-item tab-btn" data-tab="own">
+      <div class="sb-icon">
+        <svg width="15" height="15" viewBox="0 0 15 15" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round" stroke-linecap="round"><path d="M7.5 1.3l5.8 3.1v6.2l-5.8 3.1-5.8-3.1V4.4l5.8-3.1z"/><path d="M1.7 4.4l5.8 3.1 5.8-3.1M7.5 7.5v6.2"/></svg>
+      </div>
+      자사제품 관리
     </button>
 
     <button class="sb-item tab-btn" data-tab="review">
@@ -106,21 +114,6 @@
         </table>
       </div>
 
-      <div class="card" style="margin-bottom:12px;">
-        <div class="card-ey"><span class="sb-data-dot" style="display:inline-block;vertical-align:middle;margin-right:6px;"></span>실제 채널 조사 (2026.07)</div>
-        <div class="card-ttl">멀티채널 가격 모니터링</div>
-        <div class="card-sub">이지듀는 자사몰·올리브영·쿠팡 3개 채널에서 동시 판매 중입니다. 각 채널의 실제 판매가·할인율·이벤트 진행 여부를 제품별로 비교했습니다 (채널마다 판매 중인 용량/구성이 다를 수 있어 비고에 표기).</div>
-        <div class="data-freshness"><span class="dot"></span>마지막 갱신 <b>2026.07.23</b> · 권장 갱신 주기 <b>매일</b> (채널 즉시할인·기간한정 이벤트가 수시로 바뀜)</div>
-        <table id="channelPriceTable">
-          <thead>
-            <tr><th>제품</th><th>채널</th><th>정가</th><th>판매가</th><th>할인율</th><th>이벤트</th><th>비고</th></tr>
-          </thead>
-          <tbody></tbody>
-        </table>
-        <div id="channelPriceInsight" style="margin-top:10px;"></div>
-        <div class="footnote">실 서비스 연동 지점: 각 채널의 상품 상세 API/스크래핑 결과를 <code>channelPrices</code> 배열에 매일 갱신하면, 채널 간 최저가 이탈·MAP(최저광고가) 위반 여부를 자동 감지할 수 있습니다.</div>
-      </div>
-
       <div class="grid-2-eq">
         <div class="card">
           <div class="card-ey">포지셔닝 분석</div>
@@ -143,6 +136,32 @@
           <div id="alertList"></div>
           <div class="footnote">실 서비스 연동 지점: <code>checkPriceAlerts()</code>를 cron/스케줄러(예: 매일 09:00)에서 호출하고, <code>competitors</code> 배열을 스크래핑 결과로 갱신하면 됩니다.</div>
         </div>
+      </div>
+    </section>
+
+    <!-- ===================== VIEW: OWN PRODUCT MANAGEMENT ===================== -->
+    <section class="view" id="view-own">
+      <div class="sec-label">자사제품 관리</div>
+
+      <div class="card" style="margin-bottom:12px;">
+        <div class="card-ey"><span class="sb-data-dot" style="display:inline-block;vertical-align:middle;margin-right:6px;"></span>실제 채널 조사 (2026.07)</div>
+        <div class="card-ttl">멀티채널 가격 모니터링</div>
+        <div class="card-sub">이지듀는 자사몰·올리브영·쿠팡 3개 채널에서 동시 판매 중입니다. 각 채널의 실제 판매가·할인율·이벤트 진행 여부를 제품별로 비교했습니다 (채널마다 판매 중인 용량/구성이 다를 수 있어 비고에 표기).</div>
+        <div class="data-freshness"><span class="dot"></span>마지막 갱신 <b>2026.07.23</b> · 권장 갱신 주기 <b>매일</b> (채널 즉시할인·기간한정 이벤트가 수시로 바뀜)</div>
+        <table id="channelPriceTable">
+          <thead>
+            <tr><th>제품</th><th>채널</th><th>정가</th><th>판매가</th><th>할인율</th><th>이벤트</th><th>비고</th></tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+        <div id="channelPriceInsight" style="margin-top:10px;"></div>
+        <div class="footnote">실 서비스 연동 지점: 각 채널의 상품 상세 API/스크래핑 결과를 <code>channelPrices</code> 배열에 매일 갱신하면, 채널 간 최저가 이탈·MAP(최저광고가) 위반 여부를 자동 감지할 수 있습니다.</div>
+      </div>
+
+      <div class="card">
+        <div class="card-ey">다음 단계 (아이디어)</div>
+        <div class="card-ttl">재고 · 발주 관리 (예정)</div>
+        <div class="card-sub">재고 수량·발주점은 공개된 데이터가 없어 이번 프로토타입에는 아직 포함하지 않았습니다. 추가한다면 SKU별 재고 현황과 발주 필요 알림, 발주서 초안 생성 순으로 확장할 계획입니다.</div>
       </div>
     </section>
 
@@ -366,6 +385,10 @@
     <svg viewBox="0 0 15 15" fill="currentColor"><rect x="1" y="8" width="3" height="6" rx="0.5"/><rect x="6" y="4" width="3" height="10" rx="0.5"/><rect x="11" y="1" width="3" height="13" rx="0.5"/></svg>
     가격
   </button>
+  <button class="bn-item tab-btn" data-tab="own">
+    <svg viewBox="0 0 15 15" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round" stroke-linecap="round"><path d="M7.5 1.3l5.8 3.1v6.2l-5.8 3.1-5.8-3.1V4.4l5.8-3.1z"/><path d="M1.7 4.4l5.8 3.1 5.8-3.1M7.5 7.5v6.2"/></svg>
+    자사제품
+  </button>
   <button class="bn-item tab-btn" data-tab="review">
     <svg viewBox="0 0 15 15" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M2 2h11v8H8.5L6 13v-3H2V2z"/></svg>
     리뷰
@@ -378,6 +401,7 @@
 
 <script src="js/common.js"></script>
 <script src="js/price.js"></script>
+<script src="js/own-product.js"></script>
 <script src="js/review.js"></script>
 <script src="js/roas.js"></script>
 </body>

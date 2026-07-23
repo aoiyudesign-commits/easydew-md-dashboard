@@ -223,6 +223,12 @@ select:focus, input:focus { outline: none; border-color: var(--primary); }
 .amp-insight:last-child { border-bottom: none; }
 .amp-arrow { color: var(--orange); font-weight: 700; flex-shrink: 0; }
 
+/* ── TABLE ── */
+table { width: 100%; border-collapse: collapse; font-size: 12px; }
+th,td { padding: 9px 10px; text-align: left; border-bottom: 1px solid var(--canvas-soft); }
+th { color: var(--ink-faint); font-weight: 700; font-size: 9.5px; text-transform: uppercase; letter-spacing: 0.05em; }
+tr:last-child td { border-bottom: none; }
+
 canvas { max-height: 280px; }
 
 footer { border-top: 1px solid var(--hairline); padding: 16px 32px; text-align: center; font-size: 11px; color: var(--ink-faint); flex-shrink: 0; }
