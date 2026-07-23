@@ -2,185 +2,320 @@
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>EASYDEW MD 그로스 대시보드 — 포트폴리오 프로토타입</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 </head>
 <body>
-<div class="wrap">
 
-  <header class="top">
+<!-- ════ SIDEBAR ════ -->
+<aside class="sidebar">
+  <div class="sb-brand">
+    <div class="sb-brand-icon">ED</div>
     <div>
-      <div class="brand-line">
-        <div class="brand-mark">ED</div>
-        <div>
-          <h1>EASYDEW MD 그로스 대시보드</h1>
-          <div class="sub">이지듀 직영몰 운영 시나리오 기반 프로토타입 · 디엔코스메틱스 MD 직무 지원용</div>
-        </div>
-      </div>
+      <div class="sb-brand-name">EASYDEW MD 대시보드</div>
+      <div class="sb-brand-sub">이지듀 그로스 프로토타입</div>
     </div>
-    <div class="meta-tags">
-      <span class="tag">신 · 서비스기획 → MD 전환 포트폴리오</span>
-      <span class="tag" id="todayTag">2026.07.23 기준 데이터</span>
-    </div>
-  </header>
-
-  <div class="disclaimer">
-    <b>제작 노트.</b> 이지듀 제품/가격/리뷰 수는 easydew.co.kr 공식몰 및 공개 검색 결과를 기반으로 한 실데이터이며, 경쟁사(넘버즈인·구달·AXIS-Y) 가격도 올리브영·자사몰 공개 정보를 반영했습니다.
-    다만 원가율·물류비 등 비공개 재무 수치, 리뷰 감성 비율, 일별 가격 변동 로그는 실제 운영 데이터 접근 없이 만든 <b>추정·시연용(Demo) 값</b>입니다. 실제 입사 후에는 사내 데이터(카페24 통계, CRM, 손익 시트)로 값을 교체해 바로 운영 가능한 구조로 설계했습니다.
   </div>
 
-  <nav class="tabs">
-    <button class="tab-btn active" data-tab="roas">① 손익 / ROAS 시나리오 시뮬레이터</button>
-    <button class="tab-btn" data-tab="review">② 리뷰 인사이트 도구</button>
-    <button class="tab-btn" data-tab="price">③ 경쟁사 가격 모니터링</button>
+  <nav class="sb-nav">
+    <div class="sb-section-label">메뉴</div>
+
+    <button class="sb-item tab-btn active" data-tab="price">
+      <div class="sb-icon">
+        <svg width="15" height="15" viewBox="0 0 15 15" fill="currentColor"><rect x="1" y="8" width="3" height="6" rx="0.5"/><rect x="6" y="4" width="3" height="10" rx="0.5"/><rect x="11" y="1" width="3" height="13" rx="0.5"/></svg>
+      </div>
+      경쟁사 가격 모니터링
+    </button>
+
+    <button class="sb-item tab-btn" data-tab="review">
+      <div class="sb-icon">
+        <svg width="15" height="15" viewBox="0 0 15 15" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M2 2h11v8H8.5L6 13v-3H2V2z"/></svg>
+      </div>
+      리뷰 인사이트 도구
+    </button>
+
+    <button class="sb-item tab-btn" data-tab="roas">
+      <div class="sb-icon">
+        <svg width="15" height="15" viewBox="0 0 15 15" fill="currentColor"><rect x="1" y="1" width="5.5" height="5.5" rx="1"/><rect x="8.5" y="1" width="5.5" height="5.5" rx="1"/><rect x="1" y="8.5" width="5.5" height="5.5" rx="1"/><rect x="8.5" y="8.5" width="5.5" height="5.5" rx="1"/></svg>
+      </div>
+      손익 / ROAS 시나리오 시뮬레이터
+    </button>
   </nav>
 
-  <!-- ===================== TAB 1: ROAS SIMULATOR ===================== -->
-  <section class="view active" id="view-roas">
-    <div class="grid cols-2">
-      <div class="card">
-        <h2>시나리오 입력</h2>
-        <div class="hint">이지듀 실제 판매가를 기준으로, 광고 운영 가정치를 조정해 손익을 계산합니다.</div>
-
-        <label class="field">제품 선택 (판매가 자동 반영)</label>
-        <select id="productSelect"></select>
-
-        <div class="preset-btns" id="presetBtns">
-          <button data-preset="conservative">보수적</button>
-          <button data-preset="current" class="active">현재 수준</button>
-          <button data-preset="aggressive">공격적 확장</button>
-        </div>
-
-        <div class="row2">
-          <div>
-            <label class="field">월 광고비 (원)</label>
-            <input type="number" id="adBudget" value="15000000" step="500000">
-          </div>
-          <div>
-            <label class="field">평균 CPC (원)</label>
-            <input type="number" id="cpc" value="450" step="10">
-          </div>
-        </div>
-        <div class="row2">
-          <div>
-            <label class="field">구매전환율 (%)</label>
-            <input type="number" id="cvr" value="2.4" step="0.1">
-          </div>
-          <div>
-            <label class="field">매출원가율 (%)</label>
-            <input type="number" id="cogs" value="32" step="1">
-          </div>
-        </div>
-        <div class="row2">
-          <div>
-            <label class="field">건당 물류/CS비 (원)</label>
-            <input type="number" id="fulfill" value="3200" step="100">
-          </div>
-          <div>
-            <label class="field">반품률 (%)</label>
-            <input type="number" id="returnRate" value="4.5" step="0.1">
-          </div>
-        </div>
-        <div class="footnote">원가율·물류비는 뷰티 이커머스 평균치 기반 가정입니다. 실 데이터 연동 시 이 값만 교체하면 전체 계산이 자동 갱신됩니다.</div>
-      </div>
-
-      <div class="card">
-        <h2>손익 결과</h2>
-        <div class="hint" id="productHint">-</div>
-        <div class="kpi-grid" id="kpiGrid"></div>
-        <canvas id="roasChart"></canvas>
+  <div class="sb-footer">
+    <div class="sb-data-badge">
+      <div class="sb-data-dot"></div>
+      실데이터 연동 · 2026.07 기준
+    </div>
+    <div class="sb-user" style="margin-top:8px;">
+      <div class="sb-avatar">김</div>
+      <div>
+        <div class="sb-user-name">김유빈</div>
+        <div class="sb-user-role">서비스기획 → MD 전환</div>
       </div>
     </div>
+  </div>
+</aside>
 
-    <div class="card" style="margin-top:16px;">
-      <h2>광고 예산별 손익 시나리오</h2>
-      <div class="hint">현재 설정된 전환율·원가율 기준, 월 광고비를 늘렸을 때 영업이익과 ROAS가 어떻게 변하는지 보여줍니다. 손익분기 지점을 넘는 예산 구간을 파악해 예산 배분 의사결정에 활용합니다.</div>
-      <canvas id="scenarioChart" style="max-height:260px;"></canvas>
-    </div>
-  </section>
+<!-- ════ MAIN ════ -->
+<div class="main-wrap">
 
-  <!-- ===================== TAB 2: REVIEW INSIGHT ===================== -->
-  <section class="view" id="view-review">
-    <div class="grid cols-2">
-      <div class="card">
-        <h2>제품 선택</h2>
-        <div class="hint">이지듀 자사몰 리뷰 게시판 · 외부 리뷰 커뮤니티에서 수집한 실제 후기 톤을 구조화했습니다.</div>
-        <select id="reviewProductSelect"></select>
-
-        <div style="margin-top:16px;">
-          <div class="hint" style="margin-bottom:8px;">감성 분포 (추정)</div>
-          <canvas id="sentimentChart" style="max-height:200px;"></canvas>
+  <div class="dash-header">
+    <div class="dash-header-inner">
+      <div class="dash-hrow">
+        <div>
+          <div class="dash-badge">● 김유빈 · AI 기반 MD 업무 프로토타입 · 디엔코스메틱스 지원용</div>
+          <div class="dash-h1">EASYDEW MD <span>그로스 대시보드</span></div>
+          <div class="dash-sub">이지듀 직영몰 운영 시나리오 기반 프로토타입 · 손익/ROAS · 리뷰 인사이트 · 경쟁사 가격 모니터링</div>
         </div>
-
-        <div style="margin-top:10px;">
-          <div class="hint" style="margin-bottom:8px;">언급 키워드 빈도</div>
-          <canvas id="keywordChart" style="max-height:200px;"></canvas>
+        <div class="date-range">데이터 기준일&nbsp;&nbsp;<strong>2026년 7월 23일</strong></div>
+      </div>
+      <div class="header-metrics">
+        <div class="hm-cell">
+          <div class="hm-label">등록 SKU</div>
+          <div class="hm-value" id="hmSku">-</div>
+          <div class="hm-trend up">▲ 기미/미백 중심 라인업</div>
+        </div>
+        <div class="hm-cell">
+          <div class="hm-label">모니터링 경쟁사</div>
+          <div class="hm-value" id="hmBrand">-</div>
+          <div class="hm-trend up">▲ 올리브영·자사몰 공개가</div>
+        </div>
+        <div class="hm-cell">
+          <div class="hm-label">리뷰 인사이트 커버리지</div>
+          <div class="hm-value" id="hmReview">-</div>
+          <div class="hm-trend up">▲ 리뷰수 상위 제품</div>
+        </div>
+        <div class="hm-cell">
+          <div class="hm-label">데이터 소스</div>
+          <div class="hm-value">3종</div>
+          <div class="hm-trend up">▲ 판매가·리뷰·경쟁가</div>
         </div>
       </div>
-
-      <div class="card">
-        <h2>실제 리뷰 톤 요약</h2>
-        <div id="quotesPositive"></div>
-        <div id="quotesNegative"></div>
-      </div>
     </div>
-
-    <div class="grid cols-2" style="margin-top:16px;">
-      <div class="card">
-        <h2>AI 추출 USP 후보</h2>
-        <div class="hint">리뷰·제품 상세페이지 문구를 근거로 도출한 차별화 포인트입니다.</div>
-        <div id="uspList"></div>
-      </div>
-      <div class="card">
-        <h2>광고 소재 카피 제안 (파일럿 테스트용)</h2>
-        <div class="hint">USP 후보를 바로 소재 테스트에 넣을 수 있는 카피로 변환했습니다.</div>
-        <div id="copyList"></div>
-      </div>
-    </div>
-  </section>
-
-  <!-- ===================== TAB 3: COMPETITOR PRICE ===================== -->
-  <section class="view" id="view-price">
-    <div class="card">
-      <h2>기미/미백 카테고리 가격 스냅샷</h2>
-      <div class="hint">이지듀 자사몰 및 올리브영·브랜드 공식몰 공개 가격 기준 (2026.07 조사). 100ml(g) 환산 단가로 정규화했습니다.</div>
-      <table id="priceTable">
-        <thead>
-          <tr><th>브랜드</th><th>제품명</th><th>용량</th><th>정가</th><th>판매가</th><th>할인율</th><th>100ml 환산가</th><th>리뷰수</th></tr>
-        </thead>
-        <tbody></tbody>
-      </table>
-    </div>
-
-    <div class="grid cols-2" style="margin-top:16px;">
-      <div class="card">
-        <h2>가격 포지셔닝 맵</h2>
-        <div class="hint">가로축: 100ml 환산 판매가 · 세로축: 리뷰수(누적 판매·신뢰도 proxy). 우하단일수록 '가성비+검증됨' 포지션입니다.</div>
-        <canvas id="positionChart"></canvas>
-      </div>
-      <div class="card">
-        <h2>가격 변동 알림 (데모)</h2>
-        <div class="hint">실서비스에서는 매일 자동 스크래핑 스케줄러가 경쟁사 가격을 수집해 전일 대비 변동률이 아래 임계치를 넘으면 알림을 보냅니다. 임계치를 조정하면 감지 결과가 즉시 재계산됩니다.</div>
-        <div class="row2" style="align-items:end;">
-          <div>
-            <label class="field">알림 임계치 (전일 대비 %)</label>
-            <input type="number" id="alertThreshold" value="5" step="1" min="0">
-          </div>
-          <div class="footnote" id="alertLastRun" style="margin:0 0 9px;text-align:right;"></div>
-        </div>
-        <div id="alertList"></div>
-        <div class="footnote">실 서비스 연동 지점: <code>checkPriceAlerts()</code>를 cron/스케줄러(예: 매일 09:00)에서 호출하고, <code>competitors</code> 배열을 스크래핑 결과로 갱신하면 됩니다.</div>
-      </div>
-    </div>
-  </section>
-
-  <div class="footnote" style="text-align:center;margin-top:30px;">
-    Prototype by 신 · AI 기반 MD 업무 도구 제안 · 데이터 출처: easydew.co.kr, oliveyoung.co.kr, numbuzin.com, goodal 공식몰, axis-y.com (2026.07 조사)
   </div>
 
-</div>
+  <div class="dash-body">
+
+    <div class="data-note">
+      <b>제작 노트.</b> 이지듀 제품/가격/리뷰 수는 easydew.co.kr 공식몰 및 공개 검색 결과를 기반으로 한 실데이터이며, 경쟁사(넘버즈인·구달·AXIS-Y) 가격도 올리브영·자사몰 공개 정보를 반영했습니다.
+      다만 원가율·물류비 등 비공개 재무 수치, 리뷰 감성 비율, 일별 가격 변동 로그는 실제 운영 데이터 접근 없이 만든 <b>추정·시연용(Demo) 값</b>입니다. 실제 입사 후에는 사내 데이터(카페24 통계, CRM, 손익 시트)로 값을 교체해 바로 운영 가능한 구조로 설계했습니다.
+    </div>
+
+    <!-- ===================== VIEW: COMPETITOR PRICE ===================== -->
+    <section class="view active" id="view-price">
+      <div class="sec-label">경쟁사 가격 모니터링</div>
+
+      <div class="card" style="margin-bottom:12px;">
+        <div class="card-ey">기미/미백 카테고리</div>
+        <div class="card-ttl">가격 스냅샷</div>
+        <div class="card-sub">이지듀 자사몰 및 올리브영·브랜드 공식몰 공개 가격 기준 (2026.07 조사). 100ml(g) 환산 단가로 정규화했습니다.</div>
+        <table id="priceTable">
+          <thead>
+            <tr><th>브랜드</th><th>제품명</th><th>용량</th><th>정가</th><th>판매가</th><th>할인율</th><th>100ml 환산가</th><th>리뷰수</th></tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+
+      <div class="grid-2-eq">
+        <div class="card">
+          <div class="card-ey">포지셔닝 분석</div>
+          <div class="card-ttl">가격 포지셔닝 맵</div>
+          <div class="card-sub">가로축: 100ml 환산 판매가 · 세로축: 리뷰수(누적 판매·신뢰도 proxy). 우하단일수록 '가성비+검증됨' 포지션입니다.</div>
+          <div class="chart-box"><canvas id="positionChart"></canvas></div>
+        </div>
+        <div class="card">
+          <div class="card-ey"><span class="sb-data-dot" style="display:inline-block;vertical-align:middle;margin-right:6px;"></span>스케줄러 연동형</div>
+          <div class="card-ttl">가격 변동 알림 (데모)</div>
+          <div class="card-sub">실서비스에서는 매일 자동 스크래핑 스케줄러가 경쟁사 가격을 수집해 전일 대비 변동률이 아래 임계치를 넘으면 알림을 보냅니다. 임계치를 조정하면 감지 결과가 즉시 재계산됩니다.</div>
+          <div class="row2" style="align-items:end;">
+            <div>
+              <label class="field">알림 임계치 (전일 대비 %)</label>
+              <input type="number" id="alertThreshold" value="5" step="1" min="0">
+            </div>
+            <div class="footnote" id="alertLastRun" style="margin:0 0 9px;text-align:right;"></div>
+          </div>
+          <div id="alertList"></div>
+          <div class="footnote">실 서비스 연동 지점: <code>checkPriceAlerts()</code>를 cron/스케줄러(예: 매일 09:00)에서 호출하고, <code>competitors</code> 배열을 스크래핑 결과로 갱신하면 됩니다.</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================== VIEW: REVIEW INSIGHT ===================== -->
+    <section class="view" id="view-review">
+      <div class="sec-label">리뷰 인사이트 도구</div>
+
+      <div class="grid-2" style="margin-bottom:12px;">
+        <div class="card">
+          <div class="card-ey">제품 선택</div>
+          <div class="card-ttl">리뷰 톤 · 키워드 분석</div>
+          <div class="card-sub">이지듀 자사몰 리뷰 게시판 · 외부 리뷰 커뮤니티에서 수집한 실제 후기 톤을 구조화했습니다.</div>
+          <select id="reviewProductSelect"></select>
+
+          <div style="margin-top:16px;">
+            <div class="footnote" style="margin-bottom:6px;">감성 분포 (추정)</div>
+            <div class="chart-box sm"><canvas id="sentimentChart"></canvas></div>
+          </div>
+          <div style="margin-top:10px;">
+            <div class="footnote" style="margin-bottom:6px;">언급 키워드 빈도</div>
+            <div class="chart-box"><canvas id="keywordChart"></canvas></div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-ey">VOC 발췌</div>
+          <div class="card-ttl">실제 리뷰 톤 요약</div>
+          <div class="card-sub">긍정/개선 포인트를 원문 근접 톤으로 정리했습니다.</div>
+          <div id="quotesPositive"></div>
+          <div id="quotesNegative"></div>
+        </div>
+      </div>
+
+      <div class="grid-2-eq">
+        <div class="card">
+          <div class="card-ey">AI 추출</div>
+          <div class="card-ttl">USP 후보</div>
+          <div class="card-sub">리뷰·제품 상세페이지 문구를 근거로 도출한 차별화 포인트입니다.</div>
+          <div id="uspList"></div>
+        </div>
+        <div class="card">
+          <div class="card-ey">파일럿 테스트용</div>
+          <div class="card-ttl">광고 소재 카피 제안</div>
+          <div class="card-sub">USP 후보를 바로 소재 테스트에 넣을 수 있는 카피로 변환했습니다.</div>
+          <div id="copyList"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================== VIEW: ROAS SIMULATOR ===================== -->
+    <section class="view" id="view-roas">
+      <div class="sec-label">손익 / ROAS 시나리오 시뮬레이터 · 실시간 계산</div>
+
+      <div class="metrics-grid">
+        <div class="metric-card">
+          <div class="mc-top"><div class="mc-label">예상 매출</div><div class="mc-badge up" id="kpiRevenueBadge">-</div></div>
+          <div class="mc-value" id="kpiRevenueValue">-</div>
+          <div class="mc-sub" id="kpiRevenueSub">-</div>
+          <div class="sp-wrap"><canvas id="sparkRevenue"></canvas></div>
+        </div>
+        <div class="metric-card">
+          <div class="mc-top"><div class="mc-label">ROAS</div><div class="mc-badge up" id="kpiRoasBadge">-</div></div>
+          <div class="mc-value" id="kpiRoasValue">-</div>
+          <div class="mc-sub" id="kpiRoasSub">-</div>
+          <div class="sp-wrap"><canvas id="sparkRoas"></canvas></div>
+        </div>
+        <div class="metric-card">
+          <div class="mc-top"><div class="mc-label">영업이익</div><div class="mc-badge up" id="kpiProfitBadge">-</div></div>
+          <div class="mc-value" id="kpiProfitValue">-</div>
+          <div class="mc-sub" id="kpiProfitSub">-</div>
+          <div class="sp-wrap"><canvas id="sparkProfit"></canvas></div>
+        </div>
+        <div class="metric-card">
+          <div class="mc-top"><div class="mc-label">전환 주문수</div><div class="mc-badge up" id="kpiOrdersBadge">-</div></div>
+          <div class="mc-value" id="kpiOrdersValue">-</div>
+          <div class="mc-sub" id="kpiOrdersSub">-</div>
+          <div class="sp-wrap"><canvas id="sparkOrders"></canvas></div>
+        </div>
+      </div>
+
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-ey">가정치 조정</div>
+          <div class="card-ttl">시나리오 입력</div>
+          <div class="card-sub">이지듀 실제 판매가를 기준으로, 광고 운영 가정치를 조정해 손익을 계산합니다.</div>
+
+          <label class="field">제품 선택 (판매가 자동 반영)</label>
+          <select id="productSelect"></select>
+
+          <div class="preset-btns" id="presetBtns">
+            <button data-preset="conservative">보수적</button>
+            <button data-preset="current" class="active">현재 수준</button>
+            <button data-preset="aggressive">공격적 확장</button>
+          </div>
+
+          <div class="row2">
+            <div>
+              <label class="field">월 광고비 (원)</label>
+              <input type="number" id="adBudget" value="15000000" step="500000">
+            </div>
+            <div>
+              <label class="field">평균 CPC (원)</label>
+              <input type="number" id="cpc" value="450" step="10">
+            </div>
+          </div>
+          <div class="row2">
+            <div>
+              <label class="field">구매전환율 (%)</label>
+              <input type="number" id="cvr" value="2.4" step="0.1">
+            </div>
+            <div>
+              <label class="field">매출원가율 (%)</label>
+              <input type="number" id="cogs" value="32" step="1">
+            </div>
+          </div>
+          <div class="row2">
+            <div>
+              <label class="field">건당 물류/CS비 (원)</label>
+              <input type="number" id="fulfill" value="3200" step="100">
+            </div>
+            <div>
+              <label class="field">반품률 (%)</label>
+              <input type="number" id="returnRate" value="4.5" step="0.1">
+            </div>
+          </div>
+          <div class="footnote">원가율·물류비는 뷰티 이커머스 평균치 기반 가정입니다. 실 데이터 연동 시 이 값만 교체하면 전체 계산이 자동 갱신됩니다.</div>
+        </div>
+
+        <div class="card">
+          <div class="card-ey" id="productHint">-</div>
+          <div class="card-ttl">비용 구성 · 핵심 인사이트</div>
+          <div class="card-sub">매출 대비 원가·광고비·물류·반품 손실 비중과 자동 산출 인사이트입니다.</div>
+          <div class="chart-box sm"><canvas id="roasChart"></canvas></div>
+          <div class="amp-grid" style="margin-top:14px;">
+            <div class="amp-cell"><div class="amp-label">물류/CS 총비용</div><div class="amp-value" id="statFulfill">-</div></div>
+            <div class="amp-cell"><div class="amp-label">반품 손실 추정</div><div class="amp-value" id="statReturn">-</div></div>
+            <div class="amp-cell"><div class="amp-label">클릭수</div><div class="amp-value" id="statClicks">-</div></div>
+            <div class="amp-cell"><div class="amp-label">영업이익률(ROI)</div><div class="amp-value" id="statRoi">-</div></div>
+          </div>
+          <div id="roasInsights" style="margin-top:4px;"></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-ey">예산 배분 의사결정</div>
+        <div class="card-ttl">광고 예산별 손익 시나리오</div>
+        <div class="card-sub">현재 설정된 전환율·원가율 기준, 월 광고비를 늘렸을 때 영업이익과 ROAS가 어떻게 변하는지 보여줍니다. 손익분기 지점을 넘는 예산 구간을 파악해 예산 배분 의사결정에 활용합니다.</div>
+        <div class="chart-box" style="height:260px;"><canvas id="scenarioChart"></canvas></div>
+      </div>
+    </section>
+
+  </div><!-- /dash-body -->
+
+  <footer>
+    Prototype by 김유빈 · AI 기반 MD 업무 도구 제안 · 데이터 출처: easydew.co.kr, oliveyoung.co.kr, numbuzin.com, goodal 공식몰, axis-y.com (2026.07 조사)
+  </footer>
+
+</div><!-- /main-wrap -->
+
+<nav class="bottom-nav">
+  <button class="bn-item tab-btn active" data-tab="price">
+    <svg viewBox="0 0 15 15" fill="currentColor"><rect x="1" y="8" width="3" height="6" rx="0.5"/><rect x="6" y="4" width="3" height="10" rx="0.5"/><rect x="11" y="1" width="3" height="13" rx="0.5"/></svg>
+    가격
+  </button>
+  <button class="bn-item tab-btn" data-tab="review">
+    <svg viewBox="0 0 15 15" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M2 2h11v8H8.5L6 13v-3H2V2z"/></svg>
+    리뷰
+  </button>
+  <button class="bn-item tab-btn" data-tab="roas">
+    <svg viewBox="0 0 15 15" fill="currentColor"><rect x="1" y="1" width="5.5" height="5.5" rx="1"/><rect x="8.5" y="1" width="5.5" height="5.5" rx="1"/><rect x="1" y="8.5" width="5.5" height="5.5" rx="1"/><rect x="8.5" y="8.5" width="5.5" height="5.5" rx="1"/></svg>
+    ROAS
+  </button>
+</nav>
 
 <script src="script.js"></script>
 </body>

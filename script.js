@@ -122,16 +122,25 @@ const reviewInsights = {
 const defaultInsightKey = "기미 앰플 쿠션 세트 (멜라 비 토닝 앰플 쿠션)";
 
 /* =========================================================
-   TAB SWITCH
+   TAB SWITCH — sidebar + mobile bottom-nav share .tab-btn,
+   so keep both copies of the active tab in sync.
    ========================================================= */
 document.querySelectorAll(".tab-btn").forEach(btn=>{
   btn.addEventListener("click", ()=>{
-    document.querySelectorAll(".tab-btn").forEach(b=>b.classList.remove("active"));
+    const tab = btn.dataset.tab;
+    document.querySelectorAll(".tab-btn").forEach(b=>b.classList.toggle("active", b.dataset.tab===tab));
     document.querySelectorAll(".view").forEach(v=>v.classList.remove("active"));
-    btn.classList.add("active");
-    document.getElementById("view-"+btn.dataset.tab).classList.add("active");
+    document.getElementById("view-"+tab).classList.add("active");
   });
 });
+
+/* =========================================================
+   HEADER IDENTITY METRICS
+   ========================================================= */
+document.getElementById("hmSku").textContent = products.length+"개";
+document.getElementById("hmBrand").textContent =
+  new Set(competitors.filter(c=>c.brand!=="이지듀").map(c=>c.brand)).size+"개 브랜드";
+document.getElementById("hmReview").textContent = Object.keys(reviewInsights).length+"개 제품";
 
 /* =========================================================
    TAB 1: ROAS SIMULATOR
@@ -164,8 +173,43 @@ document.getElementById("presetBtns").addEventListener("click", (e)=>{
 });
 
 let roasChart, scenarioChart;
+let sparkRevenueChart, sparkRoasChart, sparkProfitChart, sparkOrdersChart;
 
 function fmt(n){ return Math.round(n).toLocaleString()+"원"; }
+
+function sparkline(id, existingChart, data, color){
+  if(existingChart) existingChart.destroy();
+  return new Chart(document.getElementById(id).getContext('2d'), {
+    type:"line",
+    data:{ labels:data.map((_,i)=>i), datasets:[{
+      data, borderColor:color, borderWidth:1.5, pointRadius:0, tension:0.35, fill:true,
+      backgroundColor:color.replace("rgb","rgba").replace(")",",0.08)")
+    }]},
+    options:{
+      responsive:true, maintainAspectRatio:false,
+      plugins:{legend:{display:false}, tooltip:{enabled:false}},
+      scales:{x:{display:false}, y:{display:false}},
+      animation:{duration:400}
+    }
+  });
+}
+
+/**
+ * 예산 5백만~4천만원 구간을 스캔해 매출/ROAS/영업이익/주문수 트렌드를 계산.
+ * 스파크라인·시나리오 차트가 같은 계산을 공유해 중복 루프를 피한다.
+ */
+function scenarioSeries(price, cpc, cvr, cogs, fulfill, returnRate){
+  const budgets=[], profits=[], roasArr=[], revenueArr=[], ordersArr=[];
+  for(let b=5000000;b<=40000000;b+=5000000){
+    const r = calcProfit(price, b, cpc, cvr, cogs, fulfill, returnRate);
+    budgets.push((b/10000).toLocaleString()+"만원");
+    profits.push(Math.round(r.profit));
+    roasArr.push(Math.round(r.roas));
+    revenueArr.push(Math.round(r.revenue));
+    ordersArr.push(Math.round(r.orders));
+  }
+  return {budgets, profits, roasArr, revenueArr, ordersArr};
+}
 
 function calcProfit(price, adBudget, cpc, cvrPct, cogsPct, fulfill, returnPct){
   const clicks = adBudget / cpc;
@@ -189,23 +233,36 @@ function computeROAS(){
   const fulfill = +document.getElementById("fulfill").value;
   const returnRate = +document.getElementById("returnRate").value;
 
-  document.getElementById("productHint").textContent = `${p.name} · 판매가 ${p.sale.toLocaleString()}원 기준 계산`;
+  document.getElementById("productHint").textContent = `${p.name} · 판매가 ${p.sale.toLocaleString()}원 기준`;
 
   const r = calcProfit(p.sale, adBudget, cpc, cvr, cogs, fulfill, returnRate);
 
-  const kpis = [
-    {lbl:"예상 매출", val:fmt(r.revenue), cls:""},
-    {lbl:"ROAS", val:r.roas.toFixed(0)+"%", cls: r.roas>=100?"pos":"neg"},
-    {lbl:"영업이익", val:fmt(r.profit), cls:r.profit>=0?"pos":"neg"},
-    {lbl:"영업이익률(ROI 대비)", val:r.roi.toFixed(1)+"%", cls:r.roi>=0?"pos":"neg"},
-    {lbl:"전환 주문수", val:Math.round(r.orders).toLocaleString()+"건", cls:""},
-    {lbl:"클릭수", val:Math.round(r.clicks).toLocaleString()+"회", cls:""},
-    {lbl:"물류/CS 총비용", val:fmt(r.fulfillCost), cls:""},
-    {lbl:"반품 손실 추정", val:fmt(r.returnLoss), cls:""},
-  ];
-  document.getElementById("kpiGrid").innerHTML = kpis.map(k=>`
-    <div class="kpi"><div class="lbl">${k.lbl}</div><div class="val ${k.cls}">${k.val}</div></div>
-  `).join("");
+  // 헤드라인 지표 4종 — metric-card 값/배지/서브 텍스트
+  document.getElementById("kpiRevenueValue").textContent = fmt(r.revenue);
+  document.getElementById("kpiRevenueBadge").className = "mc-badge " + (r.revenue>=adBudget?"up":"down");
+  document.getElementById("kpiRevenueBadge").textContent = r.revenue>=adBudget ? "▲ 손익분기 이상" : "▼ 손익분기 미만";
+  document.getElementById("kpiRevenueSub").textContent = `광고비 ${fmt(adBudget)} 투입 기준`;
+
+  document.getElementById("kpiRoasValue").textContent = r.roas.toFixed(0)+"%";
+  document.getElementById("kpiRoasBadge").className = "mc-badge " + (r.roas>=100?"up":"down");
+  document.getElementById("kpiRoasBadge").textContent = r.roas>=100 ? "▲ 목표 100% 이상" : "▼ 목표 100% 미만";
+  document.getElementById("kpiRoasSub").textContent = `손익분기 100% 대비 ${r.roas>=100?"+":""}${(r.roas-100).toFixed(0)}%p`;
+
+  document.getElementById("kpiProfitValue").textContent = fmt(r.profit);
+  document.getElementById("kpiProfitBadge").className = "mc-badge " + (r.profit>=0?"up":"down");
+  document.getElementById("kpiProfitBadge").textContent = r.profit>=0 ? "▲ 흑자" : "▼ 적자";
+  document.getElementById("kpiProfitSub").textContent = `영업이익률 ${r.roi.toFixed(1)}%`;
+
+  document.getElementById("kpiOrdersValue").textContent = Math.round(r.orders).toLocaleString()+"건";
+  document.getElementById("kpiOrdersBadge").className = "mc-badge up";
+  document.getElementById("kpiOrdersBadge").textContent = `▲ CVR ${cvr}%`;
+  document.getElementById("kpiOrdersSub").textContent = `클릭 ${Math.round(r.clicks).toLocaleString()}회 기준`;
+
+  // 보조 지표
+  document.getElementById("statFulfill").textContent = fmt(r.fulfillCost);
+  document.getElementById("statReturn").textContent = fmt(r.returnLoss);
+  document.getElementById("statClicks").textContent = Math.round(r.clicks).toLocaleString()+"회";
+  document.getElementById("statRoi").textContent = r.roi.toFixed(1)+"%";
 
   // Donut: cost breakdown
   const ctx = document.getElementById("roasChart");
@@ -213,7 +270,7 @@ function computeROAS(){
     labels:["매출원가","광고비","물류/CS","반품손실","영업이익"],
     datasets:[{
       data:[r.cogs, adBudget, r.fulfillCost, r.returnLoss, Math.max(r.profit,0)],
-      backgroundColor:["#c9c0b3","#c0784a","#e2b48c","#b8503f","#2f6b4f"],
+      backgroundColor:["#a39e98","#FF6000","#ffb27a","#e53935","#1aae39"],
       borderWidth:0,
     }]
   };
@@ -222,41 +279,53 @@ function computeROAS(){
     type:"doughnut",
     data,
     options:{
-      plugins:{legend:{position:"bottom", labels:{boxWidth:10,font:{size:11}}}},
+      plugins:{legend:{position:"bottom", labels:{boxWidth:10,font:{size:10,family:"Inter"},color:"#615d59"}}},
       cutout:"62%",
     }
   });
 
-  drawScenarioChart(p, cpc, cvr, cogs, fulfill, returnRate);
+  // 예산 스캔 시리즈 — 스파크라인 + 시나리오 차트 + 인사이트가 공유
+  const series = scenarioSeries(p.sale, cpc, cvr, cogs, fulfill, returnRate);
+  sparkRevenueChart = sparkline("sparkRevenue", sparkRevenueChart, series.revenueArr, "rgb(0,117,222)");
+  sparkRoasChart    = sparkline("sparkRoas", sparkRoasChart, series.roasArr, "rgb(255,96,0)");
+  sparkProfitChart  = sparkline("sparkProfit", sparkProfitChart, series.profits, "rgb(26,174,57)");
+  sparkOrdersChart  = sparkline("sparkOrders", sparkOrdersChart, series.ordersArr, "rgb(0,117,222)");
+
+  renderRoasInsights(p, r, adBudget, cvr, returnRate);
+  drawScenarioChart(series);
 }
 
-function drawScenarioChart(p, cpc, cvr, cogs, fulfill, returnRate){
-  const budgets = [];
-  const profits = [];
-  const roasArr = [];
-  for(let b=5000000;b<=40000000;b+=5000000){
-    const r = calcProfit(p.sale, b, cpc, cvr, cogs, fulfill, returnRate);
-    budgets.push((b/10000).toLocaleString()+"만원");
-    profits.push(Math.round(r.profit));
-    roasArr.push(Math.round(r.roas));
-  }
+function renderRoasInsights(p, r, adBudget, cvr, returnRate){
+  const cvrUp = calcProfit(p.sale, adBudget, +document.getElementById("cpc").value, cvr+1, +document.getElementById("cogs").value, +document.getElementById("fulfill").value, returnRate);
+  const revenueDelta = cvrUp.revenue - r.revenue;
+  const insights = [
+    `현재 설정 기준 ROAS ${r.roas.toFixed(0)}%, 손익분기(100%) 대비 ${r.roas>=100?`+${(r.roas-100).toFixed(0)}%p 여유`:`${(100-r.roas).toFixed(0)}%p 부족`}`,
+    `반품률 ${returnRate}% 반영 시 반품 손실 ${fmt(r.returnLoss)} — 매출의 ${(r.returnLoss/r.revenue*100).toFixed(1)}%`,
+    `구매전환율 1%p 개선 시(${cvr}%→${(cvr+1).toFixed(1)}%) 매출 약 ${fmt(revenueDelta)} 증가 추정 (현재 조건 기준)`,
+  ];
+  document.getElementById("roasInsights").innerHTML = insights.map(t=>
+    `<div class="amp-insight"><span class="amp-arrow">→</span>${t}</div>`
+  ).join("");
+}
+
+function drawScenarioChart(series){
   const ctx = document.getElementById("scenarioChart");
   if(scenarioChart) scenarioChart.destroy();
   scenarioChart = new Chart(ctx, {
     data:{
-      labels:budgets,
+      labels:series.budgets,
       datasets:[
-        {type:"bar", label:"영업이익(원)", data:profits, backgroundColor:"#2f6b4f", yAxisID:"y", borderRadius:6},
-        {type:"line", label:"ROAS(%)", data:roasArr, borderColor:"#c0784a", backgroundColor:"#c0784a", yAxisID:"y1", tension:.3, pointRadius:3},
+        {type:"bar", label:"영업이익(원)", data:series.profits, backgroundColor:"#FF6000", yAxisID:"y", borderRadius:6},
+        {type:"line", label:"ROAS(%)", data:series.roasArr, borderColor:"#0075de", backgroundColor:"#0075de", yAxisID:"y1", tension:.3, pointRadius:3},
       ]
     },
     options:{
       scales:{
-        y:{title:{display:true,text:"영업이익(원)",font:{size:11}}, ticks:{font:{size:10}}},
-        y1:{position:"right", grid:{drawOnChartArea:false}, title:{display:true,text:"ROAS(%)",font:{size:11}}, ticks:{font:{size:10}}},
-        x:{ticks:{font:{size:10}}}
+        y:{title:{display:true,text:"영업이익(원)",font:{size:11,family:"Inter"}}, ticks:{font:{size:10,family:"Inter"},color:"#a39e98"}, grid:{color:"#f6f5f4"}},
+        y1:{position:"right", grid:{drawOnChartArea:false}, title:{display:true,text:"ROAS(%)",font:{size:11,family:"Inter"}}, ticks:{font:{size:10,family:"Inter"},color:"#a39e98"}},
+        x:{ticks:{font:{size:10,family:"Inter"},color:"#a39e98"}, grid:{display:false}}
       },
-      plugins:{legend:{position:"bottom", labels:{boxWidth:10,font:{size:11}}}}
+      plugins:{legend:{position:"bottom", labels:{boxWidth:10,font:{size:10,family:"Inter"},color:"#615d59"}}}
     }
   });
 }
@@ -350,8 +419,8 @@ function renderReview(){
   if(sentimentChart) sentimentChart.destroy();
   sentimentChart = new Chart(sctx, {
     type:"doughnut",
-    data:{labels:["긍정","중립","부정"], datasets:[{data:d.sentiment, backgroundColor:["#2f6b4f","#d8cfc0","#b8503f"], borderWidth:0}]},
-    options:{cutout:"60%", plugins:{legend:{position:"bottom", labels:{boxWidth:10,font:{size:11}}}}}
+    data:{labels:["긍정","중립","부정"], datasets:[{data:d.sentiment, backgroundColor:["#1aae39","#a39e98","#e53935"], borderWidth:0}]},
+    options:{cutout:"60%", plugins:{legend:{position:"bottom", labels:{boxWidth:10,font:{size:10,family:"Inter"},color:"#615d59"}}}}
   });
 
   const kctx = document.getElementById("keywordChart");
@@ -360,16 +429,16 @@ function renderReview(){
     type:"bar",
     data:{
       labels:d.keywords.map(k=>k[0]),
-      datasets:[{data:d.keywords.map(k=>k[1]), backgroundColor:"#c0784a", borderRadius:6}]
+      datasets:[{data:d.keywords.map(k=>k[1]), backgroundColor:"#FF6000", borderRadius:6}]
     },
-    options:{indexAxis:"y", plugins:{legend:{display:false}}, scales:{x:{ticks:{font:{size:10}}}, y:{ticks:{font:{size:11}}}}}
+    options:{indexAxis:"y", plugins:{legend:{display:false}}, scales:{x:{grid:{color:"#f6f5f4"},ticks:{font:{size:10,family:"Inter"},color:"#a39e98"}}, y:{grid:{display:false},ticks:{font:{size:11,family:"Inter"},color:"#31302e"}}}}
   });
 
   document.getElementById("quotesPositive").innerHTML =
-    `<div class="hint" style="margin-bottom:8px;font-weight:700;color:#2f6b4f;">👍 긍정 리뷰</div>` +
+    `<div class="hint" style="margin-bottom:8px;font-weight:700;color:#1aae39;">👍 긍정 리뷰</div>` +
     d.positive.map(q=>`<div class="quote">${q[0]}<small>${q[1]}</small></div>`).join("");
   document.getElementById("quotesNegative").innerHTML =
-    `<div class="hint" style="margin:14px 0 8px;font-weight:700;color:#b8503f;">👎 개선 포인트</div>` +
+    `<div class="hint" style="margin:14px 0 8px;font-weight:700;color:#e53935;">👎 개선 포인트</div>` +
     d.negative.map(q=>`<div class="quote neg">${q[0]}<small>${q[1]}</small></div>`).join("");
 
   document.getElementById("uspList").innerHTML = uspBank[key].map(u=>`<div class="quote">${u}</div>`).join("");
@@ -412,12 +481,12 @@ async function initPriceTab(){
       datasets: competitors.map(c=>({
         label: c.brand+" · "+c.name,
         data: [{x: Math.round(c.sale/c.size*100), y: c.reviews}],
-        backgroundColor: c.brand==="이지듀" ? "#2f6b4f" : "#c0784a",
+        backgroundColor: c.brand==="이지듀" ? "#FF6000" : "#0075de",
         pointRadius: 8,
       }))
     },
     options:{
-      plugins:{legend:{display:true, position:"bottom", labels:{boxWidth:8,font:{size:10}}}},
+      plugins:{legend:{display:true, position:"bottom", labels:{boxWidth:8,font:{size:10,family:"Inter"},color:"#615d59"}}},
       scales:{
         x:{title:{display:true,text:"100ml(g) 환산 판매가(원)",font:{size:11}}},
         y:{title:{display:true,text:"누적 리뷰수",font:{size:11}}}
